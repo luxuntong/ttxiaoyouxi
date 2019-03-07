@@ -3919,6 +3919,7 @@ KBEngine.KBEngineApp = function(kbengineArgs)
 		else
 		{
 			var bundle = new KBEngine.Bundle();
+			KBEngine.ERROR_MSG(KBEngine.messages.Loginapp_login);
 			bundle.newMessage(KBEngine.messages.Loginapp_login);
 			bundle.writeInt8(KBEngine.app.args.clientType); // clientType
 			bundle.writeBlob(KBEngine.app.clientdatas);

@@ -17,7 +17,7 @@ class Avatar(KBEngine.Entity, EntityCommon):
 		DEBUG_MSG("new avatar cell: id=%i accountName=%s  avatarName=%s spaceID=%i" % (self.id, self.accountName, self.avatarName, self.spaceID))
 		
 	def isAvatar(self):
-		"""
+		"""joinRoom
 		virtual method.
 		"""
 		return True

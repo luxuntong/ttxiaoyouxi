@@ -58,6 +58,7 @@ cc.Class({
         this.entities = {};
         this.playerControl = null;
         this.curAvatarID = 0;
+        console.log('camera:', this.camera);
         this.cameraControl = this.camera.getComponent("CameraControl");
 
         this.enablePhysicManager();

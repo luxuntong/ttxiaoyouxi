@@ -42,7 +42,7 @@ cc.Class({
         this.btn_start.node.on('click', this.startGame, this);
         this.code = "";
         
-        cc.director.preloadScene("WorldScene");
+        cc.director.preloadScene("JumpScene");
 
         if(cc.sys.platform == cc.sys.WECHAT_GAME) {
             cc.log("we game")
@@ -269,8 +269,8 @@ cc.Class({
         KBEngine.INFO_MSG("Login is successfully!(登陆成功!)");
         this.label_hint.string = "登陆成功 !!!";
         
-        cc.director.loadScene("WorldScene", ()=> {
-            KBEngine.INFO_MSG("load world scene finished");
+        cc.director.loadScene("JumpScene", ()=> {
+            KBEngine.INFO_MSG("load jump scene finished");
             var player = KBEngine.app.player();
             if(player)
                 player.joinRoom();
