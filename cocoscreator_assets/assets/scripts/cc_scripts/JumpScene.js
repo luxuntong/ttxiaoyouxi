@@ -2,6 +2,20 @@ cc.Class({
     extends: cc.Component,
 
     properties: {
+        camera: {
+            default: null,
+            type: cc.Camera,
+        },
+
+        cameraControl: {
+            default: null,
+            type: cc.Node,
+        },
+
+        player: {
+            default: null,
+            type: cc.Node,
+        }
         // 主角跳跃高度
         // foo: {
         //     // ATTRIBUTES:
@@ -20,7 +34,11 @@ cc.Class({
         // },
     },
     onLoad: function(){
-        this.node.on(cc.Node.EventType.MOUSE_DOWN, this.onMouseDown, this);
+        this.cameraControl = this.camera.getComponent("JumpCamera");
+
+    },
+    onPlayerEnter: function(player){
+        this.cameraControl.setTarget(player);
     },
     onMouseDown: function(event){
         console.log("ckz scene down", event);

@@ -12,6 +12,11 @@ cc.Class({
         pickTouchRange: {
             default: null,
             type: cc.Node,
+        },
+
+        world: {
+            default: null,
+            type: cc.Node,
         }
         // foo: {
         //     // ATTRIBUTES:
@@ -56,13 +61,22 @@ cc.Class({
         this.pickTouchRange = cc.find("touchRange");
         console.log("ckz pick:", this.pickTouchRange);
         this.pickTouchRange.on(cc.Node.EventType.MOUSE_DOWN, this.onMouseDown, this);
+        this.pickTouchRange.on(cc.Node.EventType.MOUSE_UP, this.onMouseUp, this);
+        this.world = cc.find("World").getComponent("JumpScene");
         this.xSpeed = 0;
+        this.notifyPlayerIn();
+    },
+    notifyPlayerIn: function(){
+        this.world.onPlayerEnter(this.node);
     },
     onMouseDown: function(event){
         console.log("ckz onMouseDown");
         
         this.node.runAction(this.setJumpAction());
         this.xSpeed = 200;
+    },
+    onMouseUp: function(event){
+        this.xSpeed = 0;
     },
     update: function(dt){
         this.node.x += this.xSpeed * dt;
