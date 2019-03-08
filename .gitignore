@@ -70,3 +70,6 @@ quick_gen_project_*_autogen.sh.meta
 *.docx
 logs
 *.code-workspace
+
+
+*.pyc
