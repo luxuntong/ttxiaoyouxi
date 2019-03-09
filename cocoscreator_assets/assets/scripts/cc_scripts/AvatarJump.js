@@ -23,6 +23,14 @@ cc.Class({
             visiable: false,
             default: false,
         },
+        isFall: {
+            get(){
+                return this._isfall;
+            },
+            set(value) {
+                this._isfall = value;
+            }
+        },
         // foo: {
         //     // ATTRIBUTES:
         //     default: null,        // The default value will be used only when the component attaching
@@ -64,6 +72,13 @@ cc.Class({
         var rotateWithDown = cc.rotateBy(this.jumpDuration / 2, 180);
         return cc.sequence(cc.spawn(jumpUp, rotateWithUp), cc.spawn(jumpDown, rotateWithDown));
     },
+    onCollisionEnter: function(){
+        console.log("ckz on colli");
+        this.isFall = false;
+        this.rigid.gravityScale = 0;
+        this.rigid.linearVelocity = cc.v2();
+
+    },
 
     onSpacePressed: function() {
         this.inTheAir = true
@@ -72,28 +87,47 @@ cc.Class({
 
     start () {
         console.log("ckz start");
+        this.isFall = false;
         this.pickTouchRange = cc.find("touchRange");
         console.log("ckz pick:", this.pickTouchRange);
         this.pickTouchRange.on(cc.Node.EventType.MOUSE_DOWN, this.onMouseDown, this);
         this.pickTouchRange.on(cc.Node.EventType.MOUSE_UP, this.onMouseUp, this);
+        this.pickTouchRange.on(cc.Node.EventType.TOUCH_START, this.onMouseDown, this);
+        this.pickTouchRange.on(cc.Node.EventType.TOUCH_END, this.onMouseUp, this);
         this.world = cc.find("World").getComponent("JumpScene");
         this.xSpeed = 0;
         this.notifyPlayerIn();
+        this.rigid = this.node.getComponent(cc.RigidBody);
     },
     notifyPlayerIn: function(){
         this.world.onPlayerEnter(this.node);
     },
     onMouseDown: function(event){
-        console.log("ckz onMouseDown");
-        
-        this.node.runAction(this.setJumpAction());
-        this.xSpeed = 200;
+        var now = new Date();
+        this.pressTime = now.valueOf();
     },
     onMouseUp: function(event){
-        this.xSpeed = 0;
+        var now = new Date();
+        this.pressCost = now.valueOf() - this.pressTime;
+        console.log("ckz press", this.pressCost);
+        if (this.pressCost > 2000){
+            this.pressCost = 2000;
+        }
+
+        this.rigid.gravityScale = 1;
+        this.rigid.linearVelocity = cc.v2(this.pressCost, 900);
+        
+    },
+    reset: function(){
+        this.rigid.gravityScale = 0;
+        this.rigid.linearVelocity = cc.v2();
+        this.node.x = -475;
+        this.node.y = -67;
     },
     update: function(dt){
-        this.node.x += this.xSpeed * dt;
+        if (this.node.y < -200){
+            this.reset();
+        }
     }
     // update (dt) {},
 });

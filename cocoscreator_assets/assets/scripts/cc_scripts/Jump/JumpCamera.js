@@ -13,6 +13,7 @@ cc.Class({
         console.log("bg1:", bg1);
         console.log("bg2:", bg2);
         console.log(this.node);
+        this.vsSize = cc.view.getVisibleSize();
 
 
     },
@@ -26,7 +27,13 @@ cc.Class({
         
         let targetPos = this.target.convertToWorldSpaceAR(cc.Vec2.ZERO);
         var point = this.node.parent.convertToNodeSpaceAR(targetPos);
-        console.log("pos:", this.node.x, this.node.parent.x, this.target.x, targetPos.x, point.x);
-        this.node.x = point.x;
+        //console.log("pos:", this.node.x, this.node.parent.x, this.target.x, targetPos.x, point.x, this.vsSize);
+        var limitDiff = this.vsSize.width / 2 - 100;
+        if (this.node.x < point.x){
+            this.node.x = point.x;
+        }else if (this.node.x > point.x + limitDiff)
+        {
+            this.node.x = point.x + limitDiff;
+        }
     }
 })

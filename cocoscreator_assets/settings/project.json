@@ -1,4 +1,11 @@
 {
+  "cocos-analytics": {
+    "appID": "13798",
+    "appSecret": "959b3ac0037d0f3c2fdce94f8421a9b2",
+    "channel": "",
+    "enable": false,
+    "version": ""
+  },
   "collision-matrix": [
     [
       true,
@@ -14,6 +21,12 @@
       true,
       true,
       true
+    ],
+    [
+      false,
+      false,
+      false,
+      false
     ]
   ],
   "design-resolution-height": 640,
@@ -52,9 +65,10 @@
   "group-list": [
     "default",
     "player",
-    "item"
+    "item",
+    "UI"
   ],
-  "last-module-event-record-time": 1551283440839,
+  "last-module-event-record-time": 1552149879349,
   "simulator-orientation": false,
   "simulator-resolution": {
     "height": 640,
@@ -62,6 +76,5 @@
   },
   "start-scene": "3d8e33dd-946c-44a0-b593-134f421bd764",
   "use-customize-simulator": false,
-  "use-project-simulator-setting": false,
-  "assets-sort-type": "name"
+  "use-project-simulator-setting": false
 }

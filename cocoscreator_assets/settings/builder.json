@@ -42,7 +42,7 @@
   "title": "stone_war",
   "webOrientation": "auto",
   "wechatgame": {
-    "REMOTE_SERVER_ROOT": "http://106.14.182.206/res",
+    "REMOTE_SERVER_ROOT": "http://106.14.182.206/",
     "appid": "wxaf696b9fc9ce21b0",
     "isSubdomain": false,
     "orientation": "landscape",
