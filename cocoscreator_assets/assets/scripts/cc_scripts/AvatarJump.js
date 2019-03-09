@@ -17,7 +17,12 @@ cc.Class({
         world: {
             default: null,
             type: cc.Node,
-        }
+        },
+
+        inTheAir: {
+            visiable: false,
+            default: false,
+        },
         // foo: {
         //     // ATTRIBUTES:
         //     default: null,        // The default value will be used only when the component attaching
@@ -41,6 +46,8 @@ cc.Class({
             case cc.macro.KEY.a:
                 console.log('Press a key');
                 break;
+            case cc.macro.KEY.space:
+                break;
         }
     },
     
@@ -53,7 +60,14 @@ cc.Class({
         // 下落
         var jumpDown = cc.moveBy(this.jumpDuration, cc.v2(200, -this.jumpHeight)).easing(cc.easeCubicActionIn());
         // 不断重复
-        return cc.sequence(jumpUp, jumpDown);
+        var rotateWithUp = cc.rotateBy(this.jumpDuration / 2, 180);
+        var rotateWithDown = cc.rotateBy(this.jumpDuration / 2, 180);
+        return cc.sequence(cc.spawn(jumpUp, rotateWithUp), cc.spawn(jumpDown, rotateWithDown));
+    },
+
+    onSpacePressed: function() {
+        this.inTheAir = true
+        this.node.runAction(this.setJumpAction());
     },
 
     start () {
