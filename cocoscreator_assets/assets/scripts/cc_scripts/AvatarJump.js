@@ -1,3 +1,5 @@
+
+
 cc.Class({
     extends: cc.Component,
 
@@ -8,12 +10,14 @@ cc.Class({
         jumpDuration: 0,
         // 最大移动速度
         maxMoveSpeed: 0,
-
         pickTouchRange: {
             default: null,
             type: cc.Node,
         },
-
+        stateControl: {
+            default: null,
+            type: cc.Node,
+        },
         world: {
             default: null,
             type: cc.Node,
@@ -74,7 +78,6 @@ cc.Class({
     },
     onCollisionEnter: function(){
         console.log("ckz on colli");
-        this.isFall = false;
         this.rigid.gravityScale = 0;
         this.rigid.linearVelocity = cc.v2();
 
@@ -86,23 +89,27 @@ cc.Class({
     },
 
     start () {
-        console.log("ckz start");
-        this.isFall = false;
         this.pickTouchRange = cc.find("touchRange");
         console.log("ckz pick:", this.pickTouchRange);
+        this.world = cc.find("World").getComponent("JumpScene");
+        this.stateControl = this.node.getComponent("AvatarState");
+        this.stateControl.reset();
+        this.xSpeed = 0;
+        this.notifyPlayerIn();
+        this.rigid = this.node.getComponent(cc.RigidBody);
+        this.installEvents();
+    }, 
+    installEvents: function(){
         this.pickTouchRange.on(cc.Node.EventType.MOUSE_DOWN, this.onMouseDown, this);
         this.pickTouchRange.on(cc.Node.EventType.MOUSE_UP, this.onMouseUp, this);
         this.pickTouchRange.on(cc.Node.EventType.TOUCH_START, this.onMouseDown, this);
         this.pickTouchRange.on(cc.Node.EventType.TOUCH_END, this.onMouseUp, this);
-        this.world = cc.find("World").getComponent("JumpScene");
-        this.xSpeed = 0;
-        this.notifyPlayerIn();
-        this.rigid = this.node.getComponent(cc.RigidBody);
     },
     notifyPlayerIn: function(){
         this.world.onPlayerEnter(this.node);
     },
     onMouseDown: function(event){
+        this.stateControl.setState(AVATAR_STATE.storage);
         var now = new Date();
         this.pressTime = now.valueOf();
     },

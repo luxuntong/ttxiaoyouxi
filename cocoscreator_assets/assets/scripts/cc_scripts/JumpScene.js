@@ -40,8 +40,21 @@ cc.Class({
         // },
     },
     onLoad: function(){
-        var flatStart = -480 + this.flatWidth;
         this.cameraControl = this.camera.getComponent("JumpCamera");
+        this.initFlat();
+        this.initPhyx();
+    },
+    initPhyx: function(){
+        var manager = cc.director.getCollisionManager();
+        manager.enabled = true;
+
+        var gravityManager = cc.director.getPhysicsManager();
+        gravityManager.enabled = true;
+        gravityManager.gravity = cc.v2(0, -this.gravity);
+    },
+    initFlat: function(){
+        var flatStart = -480 + this.flatWidth;
+        this.flatList = new Array();
         for (let i = 0; i < 10; i ++){
             var newFlat = cc.instantiate(this.flatPrefab);
 
@@ -49,14 +62,11 @@ cc.Class({
             console.log("ckz new pos:", newPos)
             this.node.addChild(newFlat);
             newFlat.setPosition(newPos);
+            this.flatList.push({
+                'pos': newPos,
+                'flat': newFlat
+            });
         }
-        var manager = cc.director.getCollisionManager();
-        manager.enabled = true;
-
-        var gravityManager = cc.director.getPhysicsManager();
-        gravityManager.enabled = true;
-        gravityManager.gravity = cc.v2(0, -this.gravity);
-
     },
     onPlayerEnter: function(player){
         this.cameraControl.setTarget(player);
