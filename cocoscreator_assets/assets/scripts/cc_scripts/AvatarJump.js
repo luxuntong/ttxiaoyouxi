@@ -1,5 +1,6 @@
 
-
+var AVATAR_STATE = require("cc_scripts/CONST/gameconst");
+var KBEngine = require("kbengine")
 cc.Class({
     extends: cc.Component,
 
@@ -76,10 +77,18 @@ cc.Class({
         var rotateWithDown = cc.rotateBy(this.jumpDuration / 2, 180);
         return cc.sequence(cc.spawn(jumpUp, rotateWithUp), cc.spawn(jumpDown, rotateWithDown));
     },
-    onCollisionEnter: function(){
+    onCollisionEnter: function(other, self){
+        console.log(other.name, other);
+        if (other.name.startsWith("debuff")){
+            other.node.destroy();
+            return;
+        }
+        this.stateControl.setState(AVATAR_STATE.idle);
+
         console.log("ckz on colli");
         this.rigid.gravityScale = 0;
         this.rigid.linearVelocity = cc.v2();
+        this.world.onPlayerLanded();
 
     },
 
@@ -94,6 +103,7 @@ cc.Class({
         this.world = cc.find("World").getComponent("JumpScene");
         this.stateControl = this.node.getComponent("AvatarState");
         this.stateControl.reset();
+        this.stateControl.printState();
         this.xSpeed = 0;
         this.notifyPlayerIn();
         this.rigid = this.node.getComponent(cc.RigidBody);
@@ -109,11 +119,20 @@ cc.Class({
         this.world.onPlayerEnter(this.node);
     },
     onMouseDown: function(event){
-        this.stateControl.setState(AVATAR_STATE.storage);
+        this.stateControl.printState();
+        if(!this.stateControl.setState(AVATAR_STATE.storage))
+        {
+            return;
+        }
         var now = new Date();
         this.pressTime = now.valueOf();
     },
     onMouseUp: function(event){
+        if(!this.stateControl.setState(AVATAR_STATE.fly))
+        {
+            return;
+        }
+
         var now = new Date();
         this.pressCost = now.valueOf() - this.pressTime;
         console.log("ckz press", this.pressCost);
@@ -125,15 +144,19 @@ cc.Class({
         this.rigid.linearVelocity = cc.v2(this.pressCost, 900);
         
     },
+    completed: function(isWin){
+        this.world.onCompleted(isWin);
+    },
     reset: function(){
         this.rigid.gravityScale = 0;
         this.rigid.linearVelocity = cc.v2();
         this.node.x = -475;
         this.node.y = -67;
+        this.stateControl.reset();
     },
     update: function(dt){
         if (this.node.y < -200){
-            this.reset();
+            this.completed(false);
         }
     }
     // update (dt) {},

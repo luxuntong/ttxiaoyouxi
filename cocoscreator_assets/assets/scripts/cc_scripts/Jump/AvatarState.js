@@ -1,4 +1,4 @@
-var gameconst = require("cc_scripts/CONST/gameconst");
+var KBEngine = require("kbengine")
 const STATE_CHANGE = {
     doubleSave: 0,
     change: 1,
@@ -21,9 +21,9 @@ cc.Class({
         state: 1
     },
     onLoad: function(){
-        console.log("ckz state:", gameconst);
     },
     checkSetState: function(statePos){
+        console.log("check statePos:", statePos, STATE_CONFLICT);
         var conflictList = STATE_CONFLICT[statePos];
         for (var oriPos = 0; oriPos < conflictList.length; oriPos++){
             if (!this.getState(oriPos)){
@@ -31,6 +31,8 @@ cc.Class({
             }
 
             if (conflictList[oriPos] == STATE_CHANGE.cant){
+                KBEngine.DEBUG_MSG("ckz check failed:");
+                console.log(statePos, this.state);
                 return false;
             }
         }
@@ -68,6 +70,9 @@ cc.Class({
     },
     reset: function(){
         this.state = 1;
+    },
+    printState: function(){
+        console.log("print state:", this.state);
     }
 
     // update (dt) {},

@@ -16,7 +16,15 @@ cc.Class({
             default: null,
             type: cc.Node,
         },
+        playerJump: {
+            default: null,
+            type: cc.Node
+        },
         flatPrefab: {
+            default: null,
+            type: cc.Prefab
+        },
+        itemPrefab: {
             default: null,
             type: cc.Prefab
         },
@@ -56,20 +64,83 @@ cc.Class({
         var flatStart = -480 + this.flatWidth;
         this.flatList = new Array();
         for (let i = 0; i < 10; i ++){
-            var newFlat = cc.instantiate(this.flatPrefab);
 
             var newPos = cc.v2(flatStart + i * this.flatWidth, -179);
-            console.log("ckz new pos:", newPos)
-            this.node.addChild(newFlat);
-            newFlat.setPosition(newPos);
-            this.flatList.push({
-                'pos': newPos,
-                'flat': newFlat
-            });
+            this.flatList.push(this.createFlat(newPos));
         }
+    },
+    createFlat: function(pos){
+        var newFlat = cc.instantiate(this.flatPrefab);
+        this.node.addChild(newFlat);
+        newFlat.setPosition(pos);
+        return {
+            pos: pos,
+            flat: newFlat,
+            width: 171,
+            item: this.randomItem(pos)
+        }        
     },
     onPlayerEnter: function(player){
         this.cameraControl.setTarget(player);
+        this.player = player;
+        this.playerJump = player.getComponent("AvatarJump")
+    },
+    onPlayerLanded: function(){
+        for (var flatIndex in this.flatList){
+            var flat = this.flatList[flatIndex]
+            var flatX = flat.pos.x;
+            var half = flat.width / 2;
+            if ((flatX - half - 100 < this.player.x) && (flatX + half + 100 > this.player.x)){
+                console.log(flat, flatIndex)
+                this.destroyFlat(flatIndex);
+            }
+        }
+    },
+    destroyFlat: function(nowIndex){
+        var eraseIndex = nowIndex - 2;
+        if (eraseIndex < 0){
+            return;
+        }
+
+        for (var i = 0; i <= eraseIndex; i++){
+            var flat = this.flatList.shift();
+            flat.flat.destroy();
+            if (flat.item){
+                flat.item.destroy();
+            }
+        }
+    },
+    destroyAllFlat: function(){
+        for (var flat of this.flatList){
+            flat.flat.destroy();
+            if (flat.item){
+                flat.item.destroy();
+            }
+        }
+        this.flatList.length = 0;
+    },
+    randomItem: function(pos){
+        var randValue = Math.random()
+        console.log("random ", randValue);
+        if (randValue < 0.4){
+            console.log("create Item ");
+            var newItem = cc.instantiate(this.itemPrefab);
+            var newPos = cc.v2(pos.x + 50, pos.y + 70);
+            this.node.addChild(newItem);
+            newItem.setPosition(newPos);
+            return newItem;
+        }
+        return null;
+    },
+    reset: function(){
+        this.destroyAllFlat();
+        this.initFlat();
+    },
+    onCompleted: function(isWin){
+        if (!isWin){
+            this.playerJump.reset();
+            this.reset();
+        }
     }
     // update (dt) {},
 });
