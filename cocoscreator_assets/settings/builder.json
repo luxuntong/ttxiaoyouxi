@@ -43,7 +43,7 @@
     "orientation": "portrait"
   },
   "startScene": "3d8e33dd-946c-44a0-b593-134f421bd764",
-  "title": "",
+  "title": "cocoscreator_assets",
   "webOrientation": "auto",
   "wechatgame": {
     "REMOTE_SERVER_ROOT": "http://106.14.182.206/",
