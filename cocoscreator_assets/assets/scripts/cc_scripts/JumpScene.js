@@ -29,6 +29,7 @@ cc.Class({
             type: cc.Prefab
         },
         flatWidth: 0,
+        flatY: -179,
         gravity: 0,
         // 主角跳跃高度
         // foo: {
@@ -48,10 +49,16 @@ cc.Class({
         // },
     },
     onLoad: function(){
+        console.log("ckz on load:", this.flatPrefab);
         this.cameraControl = this.camera.getComponent("JumpCamera");
         this.initFlat();
         this.initPhyx();
     },
+    getAvatarY: function(){
+        console.log(this.flatY, this.flatPrefab.data.height)
+        return this.flatY + this.flatPrefab.data.height / 2;
+    }
+    ,
     initPhyx: function(){
         var manager = cc.director.getCollisionManager();
         manager.enabled = true;
@@ -65,7 +72,7 @@ cc.Class({
         this.flatList = new Array();
         for (let i = 0; i < 10; i ++){
 
-            var newPos = cc.v2(flatStart + i * this.flatWidth, -179);
+            var newPos = cc.v2(flatStart + i * this.flatWidth, this.flatY);
             this.flatList.push(this.createFlat(newPos));
         }
     },

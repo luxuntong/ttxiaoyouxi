@@ -10,9 +10,10 @@ const STATE_CHANGE = {
  * 2： 不能切换
  */
 const STATE_CONFLICT = [
-    [2, 2, 1],
-    [1, 2, 2],
-    [2, 1, 2]
+    [2, 2, 1, 1],
+    [1, 2, 2, 2],
+    [2, 1, 2, 2],
+    [2, 2, 2, 2]
 ];
 cc.Class({
     extends: cc.Component,
@@ -32,7 +33,7 @@ cc.Class({
 
             if (conflictList[oriPos] == STATE_CHANGE.cant){
                 KBEngine.DEBUG_MSG("ckz check failed:");
-                console.log(statePos, this.state);
+                console.log(statePos, this.state, oriPos, conflictList);
                 return false;
             }
         }

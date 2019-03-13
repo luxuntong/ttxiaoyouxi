@@ -78,7 +78,7 @@ cc.Class({
         return cc.sequence(cc.spawn(jumpUp, rotateWithUp), cc.spawn(jumpDown, rotateWithDown));
     },
     onCollisionEnter: function(other, self){
-        console.log(other.name, other);
+        console.log(self, other.name, other);
         if (other.name.startsWith("debuff")){
             other.node.destroy();
             return;
@@ -98,16 +98,23 @@ cc.Class({
     },
 
     start () {
+        this.initSize();
+        this.initComp();
+        this.notifyPlayerIn();
+        this.installEvents();
+        this.reset();
+    },
+    initComp: function(){
         this.pickTouchRange = cc.find("touchRange");
-        console.log("ckz pick:", this.pickTouchRange);
         this.world = cc.find("World").getComponent("JumpScene");
         this.stateControl = this.node.getComponent("AvatarState");
-        this.stateControl.reset();
-        this.stateControl.printState();
-        this.xSpeed = 0;
-        this.notifyPlayerIn();
         this.rigid = this.node.getComponent(cc.RigidBody);
-        this.installEvents();
+    },
+    initSize: function(){
+        this.node.scaleX = 0.1;
+        this.node.scaleY = 0.1;
+        this.trueWidth = this.node.scaleX * this.node.width;
+        this.trueHeight = this.node.scaleY * this.node.height;
     }, 
     installEvents: function(){
         this.pickTouchRange.on(cc.Node.EventType.MOUSE_DOWN, this.onMouseDown, this);
@@ -148,10 +155,11 @@ cc.Class({
         this.world.onCompleted(isWin);
     },
     reset: function(){
+        KBEngine.DEBUG_MSG("ckz reset!")
         this.rigid.gravityScale = 0;
-        this.rigid.linearVelocity = cc.v2();
+        this.rigid.linearVelocity = cc.v2(0, 0);
         this.node.x = -475;
-        this.node.y = -67;
+        this.node.y = this.world.getAvatarY() + this.trueHeight / 2;
         this.stateControl.reset();
     },
     update: function(dt){
