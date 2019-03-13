@@ -1,6 +1,7 @@
 
-var AVATAR_STATE = require("cc_scripts/CONST/gameconst");
-var KBEngine = require("kbengine")
+var AVATAR_STATE = require("gameconst");
+const SDD = require("single_data");
+var KBEngine = require("kbengine");
 cc.Class({
     extends: cc.Component,
 
@@ -111,8 +112,8 @@ cc.Class({
         this.rigid = this.node.getComponent(cc.RigidBody);
     },
     initSize: function(){
-        this.node.scaleX = 0.1;
-        this.node.scaleY = 0.1;
+        this.node.scaleX = SDD.avatar_scale_x;
+        this.node.scaleY = SDD.avatar_scale_y;
         this.trueWidth = this.node.scaleX * this.node.width;
         this.trueHeight = this.node.scaleY * this.node.height;
     }, 

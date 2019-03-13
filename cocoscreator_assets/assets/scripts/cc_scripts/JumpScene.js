@@ -1,3 +1,4 @@
+const SDD = require("single_data")
 cc.Class({
     extends: cc.Component,
 
@@ -28,7 +29,6 @@ cc.Class({
             default: null,
             type: cc.Prefab
         },
-        flatWidth: 0,
         flatY: -179,
         gravity: 0,
         // 主角跳跃高度
@@ -68,23 +68,27 @@ cc.Class({
         gravityManager.gravity = cc.v2(0, -this.gravity);
     },
     initFlat: function(){
-        var flatStart = -480 + this.flatWidth;
+        var flatStart = -480 + SDD.flat_spacing;
         this.flatList = new Array();
         for (let i = 0; i < 10; i ++){
 
-            var newPos = cc.v2(flatStart + i * this.flatWidth, this.flatY);
+            var newPos = cc.v2(flatStart + i * SDD.flat_spacing, this.flatY);
             this.flatList.push(this.createFlat(newPos));
         }
     },
     createFlat: function(pos){
         var newFlat = cc.instantiate(this.flatPrefab);
         this.node.addChild(newFlat);
+        var halfRange = SDD.flat_x_random_range / 2;
+        pos.x = pos.x - halfRange + SDD.flat_x_random_range * Math.random();
         newFlat.setPosition(pos);
+        newFlat.scaleX = 1 + SDD.flat_random_width * Math.random();
+        var flatWidth = newFlat.width * newFlat.scaleX;
         return {
             pos: pos,
             flat: newFlat,
-            width: 171,
-            item: this.randomItem(pos)
+            width: flatWidth,
+            item: this.randomItem(pos, newFlat)
         }        
     },
     onPlayerEnter: function(player){
@@ -126,13 +130,16 @@ cc.Class({
         }
         this.flatList.length = 0;
     },
-    randomItem: function(pos){
+    randomItem: function(pos, flat){
         var randValue = Math.random()
-        console.log("random ", randValue);
         if (randValue < 0.4){
-            console.log("create Item ");
+            var flatWidth = flat.scaleX * flat.width;
+            var flatHalfHeight = flat.scaleY * flat.height / 2;
             var newItem = cc.instantiate(this.itemPrefab);
-            var newPos = cc.v2(pos.x + 50, pos.y + 70);
+            newItem.scaleX = SDD.item_scale_x;
+            newItem.scaleY = SDD.item_scale_y;
+            var newX = pos.x - flatWidth / 2 + flatWidth * Math.random();
+            var newPos = cc.v2(newX, pos.y + flatHalfHeight + newItem.height * newItem.scaleY / 2);
             this.node.addChild(newItem);
             newItem.setPosition(newPos);
             return newItem;

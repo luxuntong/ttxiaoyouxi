@@ -73,3 +73,5 @@ logs
 
 
 *.pyc
+*.project
+/plan/*.pydevproject

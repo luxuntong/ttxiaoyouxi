@@ -66,6 +66,6 @@ class Plan(object):
 
 
 if __name__ == '__main__':
-    plan = Plan('.', r'..\cocoscreator_assets\assets\scripts\cc_scripts\CONST',
+    plan = Plan('.', r'..\cocoscreator_assets\assets\scripts',
                 r'..\kbengine_stone_assets\scripts\data')
     plan.test()
