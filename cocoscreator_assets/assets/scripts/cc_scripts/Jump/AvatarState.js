@@ -24,7 +24,7 @@ cc.Class({
     onLoad: function(){
     },
     checkSetState: function(statePos){
-        console.log("check statePos:", statePos, STATE_CONFLICT);
+        //console.log("check statePos:", statePos, STATE_CONFLICT);
         var conflictList = STATE_CONFLICT[statePos];
         for (var oriPos = 0; oriPos < conflictList.length; oriPos++){
             if (!this.getState(oriPos)){

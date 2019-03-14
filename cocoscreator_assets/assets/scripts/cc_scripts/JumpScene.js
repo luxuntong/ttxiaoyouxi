@@ -29,6 +29,14 @@ cc.Class({
             default: null,
             type: cc.Prefab
         },
+        curScoreDisplay: {
+            default: null,
+            type: cc.Label
+        },
+        highScoreDisplay: {
+            default: null,
+            type: cc.Label
+        },
         flatY: -179,
         gravity: 0,
         // 主角跳跃高度
@@ -51,8 +59,14 @@ cc.Class({
     onLoad: function(){
         console.log("ckz on load:", this.flatPrefab);
         this.cameraControl = this.camera.getComponent("JumpCamera");
+        this.initDisplay();
         this.initFlat();
         this.initPhyx();
+    },
+    initDisplay: function(){
+        this.high = 0;
+        this.curScoreDisplay.string = 'cur: 0';
+        this.highScoreDisplay.string = 'high: 0';
     },
     getAvatarY: function(){
         console.log(this.flatY, this.flatPrefab.data.height)
@@ -68,11 +82,12 @@ cc.Class({
         gravityManager.gravity = cc.v2(0, -this.gravity);
     },
     initFlat: function(){
-        var flatStart = -480 + SDD.flat_spacing;
+        this.flatStart = -480;
         this.flatList = new Array();
+        this.flatIndex = 0;
         for (let i = 0; i < 10; i ++){
-
-            var newPos = cc.v2(flatStart + i * SDD.flat_spacing, this.flatY);
+            this.flatStart += SDD.flat_spacing;
+            var newPos = cc.v2(this.flatStart, this.flatY);
             this.flatList.push(this.createFlat(newPos));
         }
     },
@@ -82,6 +97,7 @@ cc.Class({
         var halfRange = SDD.flat_x_random_range / 2;
         pos.x = pos.x - halfRange + SDD.flat_x_random_range * Math.random();
         newFlat.setPosition(pos);
+        newFlat.flatIndex = this.flatIndex++;
         newFlat.scaleX = 1 + SDD.flat_random_width * Math.random();
         var flatWidth = newFlat.width * newFlat.scaleX;
         return {
@@ -96,14 +112,33 @@ cc.Class({
         this.player = player;
         this.playerJump = player.getComponent("AvatarJump")
     },
-    onPlayerLanded: function(){
-        for (var flatIndex in this.flatList){
-            var flat = this.flatList[flatIndex]
+    getFlatIndex: function(x){
+        for (var flat of this.flatList){
             var flatX = flat.pos.x;
             var half = flat.width / 2;
-            if ((flatX - half - 100 < this.player.x) && (flatX + half + 100 > this.player.x)){
-                console.log(flat, flatIndex)
-                this.destroyFlat(flatIndex);
+            if ((x >= flatX - half) && (x <= flatX + half)){
+                return flat.flat.flatIndex;
+            }
+        }
+        return -1;
+    },
+    onPlayerLanded: function(index){
+        var score = index + 1;
+        this.curScoreDisplay.string = 'cur: ' + score;
+        if (score > this.high){
+            this.high = score;
+            this.highScoreDisplay.string = 'high: ' + this.high;
+        }
+        for (var i in this.flatList){
+            var flat = this.flatList[i]
+            var flatX = flat.pos.x;
+            var half = flat.width / 2;
+            if (flat.flat.flatIndex == index){
+                console.log("onPlayerLanded", i)
+                this.curIndex = i;
+                this.destroyFlat(i);
+                this.fullOfFlat();
+                break;
             }
         }
     },
@@ -119,7 +154,20 @@ cc.Class({
             if (flat.item){
                 flat.item.destroy();
             }
+            this.curIndex--;
         }
+    },
+    fullOfFlat: function(){
+        var need = 15 - this.flatList.length;
+        for (let i = 0; i < need; i ++){
+            this.flatStart += SDD.flat_spacing;
+            var newPos = cc.v2(this.flatStart, this.flatY);
+            this.flatList.push(this.createFlat(newPos));
+        }
+    },
+    getSurfaceHigh: function(flat){
+        var half = flat.scaleY * flat.height / 2;
+        return flat.y + half;
     },
     destroyAllFlat: function(){
         for (var flat of this.flatList){
@@ -134,12 +182,11 @@ cc.Class({
         var randValue = Math.random()
         if (randValue < 0.4){
             var flatWidth = flat.scaleX * flat.width;
-            var flatHalfHeight = flat.scaleY * flat.height / 2;
             var newItem = cc.instantiate(this.itemPrefab);
             newItem.scaleX = SDD.item_scale_x;
             newItem.scaleY = SDD.item_scale_y;
             var newX = pos.x - flatWidth / 2 + flatWidth * Math.random();
-            var newPos = cc.v2(newX, pos.y + flatHalfHeight + newItem.height * newItem.scaleY / 2);
+            var newPos = cc.v2(newX, this.getSurfaceHigh(flat) + newItem.height * newItem.scaleY / 2);
             this.node.addChild(newItem);
             newItem.setPosition(newPos);
             return newItem;
@@ -149,6 +196,7 @@ cc.Class({
     reset: function(){
         this.destroyAllFlat();
         this.initFlat();
+        this.curScoreDisplay.string = "cur: 0";
     },
     onCompleted: function(isWin){
         if (!isWin){

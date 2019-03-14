@@ -27,6 +27,13 @@
       false,
       false,
       false
+    ],
+    [
+      false,
+      false,
+      false,
+      false,
+      false
     ]
   ],
   "design-resolution-height": 640,
@@ -66,7 +73,8 @@
     "default",
     "player",
     "item",
-    "UI"
+    "UI",
+    "back"
   ],
   "last-module-event-record-time": 1552149879349,
   "simulator-orientation": false,

@@ -79,18 +79,11 @@ cc.Class({
         return cc.sequence(cc.spawn(jumpUp, rotateWithUp), cc.spawn(jumpDown, rotateWithDown));
     },
     onCollisionEnter: function(other, self){
-        console.log(self, other.name, other);
+        console.log(other.node.flatIndex);
         if (other.name.startsWith("debuff")){
             other.node.destroy();
             return;
         }
-        this.stateControl.setState(AVATAR_STATE.idle);
-
-        console.log("ckz on colli");
-        this.rigid.gravityScale = 0;
-        this.rigid.linearVelocity = cc.v2();
-        this.world.onPlayerLanded();
-
     },
 
     onSpacePressed: function() {
@@ -144,13 +137,21 @@ cc.Class({
         var now = new Date();
         this.pressCost = now.valueOf() - this.pressTime;
         console.log("ckz press", this.pressCost);
-        if (this.pressCost > 2000){
-            this.pressCost = 2000;
+        if (this.pressCost > 1500){
+            this.pressCost = 1500;
         }
-
-        this.rigid.gravityScale = 1;
-        this.rigid.linearVelocity = cc.v2(this.pressCost, 900);
-        
+        var angle = (this.pressCost * Math.PI / 1650) / 2;
+        var xSpeed = SDD.speed_base * Math.sin(angle);
+        var ySpeed = SDD.speed_base * Math.cos(angle);
+        this.yA = this.node.y;
+        this.yB = ySpeed / 1000;
+        this.yC = - SDD.gravity / 1000000;
+        this.xA = this.node.x;
+        this.xB = xSpeed / 1000;
+        var tCost = - this.yB / this.yC;
+        this.finalX = this.xA + tCost * this.xB;
+        this.curIndex = this.world.getFlatIndex(this.finalX);
+        this.releaseTime = (new Date()).valueOf();
     },
     completed: function(isWin){
         this.world.onCompleted(isWin);
@@ -164,6 +165,23 @@ cc.Class({
         this.stateControl.reset();
     },
     update: function(dt){
+        if (this.stateControl.getState(AVATAR_STATE.fly)){
+            var tCost = (new Date()).valueOf() - this.releaseTime;
+            var y = this.yA + this.yB * tCost + this.yC * tCost * tCost;
+            var x = this.xA + tCost * this.xB;
+            if (this.curIndex != -1 && y < this.yA){
+                this.node.y = this.yA;
+                this.node.x = this.finalX;
+                
+                this.stateControl.setState(AVATAR_STATE.idle);
+                this.world.onPlayerLanded(this.curIndex);
+            }
+            else{
+                this.node.y = y;
+                this.node.x = x;
+            }
+        }
+
         if (this.node.y < -200){
             this.completed(false);
         }
