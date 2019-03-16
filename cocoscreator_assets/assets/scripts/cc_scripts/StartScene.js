@@ -36,13 +36,12 @@ cc.Class({
         cc.log("ckz on load1");
         this.initKbengine();
         this.installEvents();
-        this.loadItemPrefab();
         
         this.userName = cc.sys.platform != cc.sys.WECHAT_GAME ? this.randomstring(4): '';
         this.btn_start.node.on('click', this.startGame, this);
         this.code = "";
         
-        cc.director.preloadScene("JumpScene");
+        cc.director.preloadScene("HallScene");
 
         if(cc.sys.platform == cc.sys.WECHAT_GAME) {
             cc.log("we game")
@@ -79,76 +78,61 @@ cc.Class({
             success: (res) => {
                 cc.log("res:");
                 cc.log(res);
-                if(res.code) {
-                    that.code = res.code;
-                    wx.getSetting({
-                        success: function(res){
-                            console.log(res);
-                            if (res.authSetting['scope.userInfo'])
-                            {
-                                wx.getUserInfo({
-                                    success: (res) => {
-                                        cc.log('success', res)
-                                        that.btn_start.node.active = true;
-                                        that.userName = that.code;
-                                        cc.sys.localStorage.setItem("encryptedData", res.encryptedData);
-                                        cc.sys.localStorage.setItem("iv", res.iv);
-                                    },
-                                    fail: (res) =>{
-                                        cc.log('fail:', res);
-                                    },
-                                    complete: (res) => {
-                                        cc.log('complete:', res)
-                                    }
-            
-                                });
-                            }
-                            else
-                            {
-                                let button = wx.createUserInfoButton({
-                                    type: 'text',
-                                    text: '获取用户信息',
-                                    style: {
-                                      left: 10,
-                                      top: 76,
-                                      width: 200,
-                                      height: 40,
-                                      lineHeight: 40,
-                                      backgroundColor: '#ff0000',
-                                      color: '#ffffff',
-                                      textAlign: 'center',
-                                      fontSize: 16,
-                                      borderRadius: 4
-                                    }
-                                  });
-                                button.onTap((res) => {
+                if(!res.code) {
+                    return;
+                }
+
+                that.code = res.code;
+                wx.getSetting({
+                    success: function(res){
+                        console.log(res);
+                        if (res.authSetting['scope.userInfo'])
+                        {
+                            wx.getUserInfo({
+                                success: (res) => {
                                     cc.log('success', res)
                                     that.btn_start.node.active = true;
                                     that.userName = that.code;
                                     cc.sys.localStorage.setItem("encryptedData", res.encryptedData);
                                     cc.sys.localStorage.setItem("iv", res.iv);
-                                })
-                            }
+                                },
+                                fail: (res) =>{
+                                    cc.log('fail:', res);
+                                },
+                                complete: (res) => {
+                                    cc.log('complete:', res)
+                                }
+        
+                            });
                         }
-                    });
-                    /*
-                    wx.getUserInfo({
-                        success: (res) => {
-                            cc.log('success', res)
-                            this.btn_start.node.active = true;
-                            this.userName = this.code;
-                            cc.sys.localStorage.setItem("encryptedData", res.encryptedData);
-                            cc.sys.localStorage.setItem("iv", res.iv);
-                        },
-                        fail: (res) =>{
-                            cc.log('fail:', res);
-                        },
-                        complete: (res) => {
-                            cc.log('complete:', res)
+                        else
+                        {
+                            let button = wx.createUserInfoButton({
+                                type: 'text',
+                                text: '获取用户信息',
+                                style: {
+                                    left: 10,
+                                    top: 76,
+                                    width: 200,
+                                    height: 40,
+                                    lineHeight: 40,
+                                    backgroundColor: '#ff0000',
+                                    color: '#ffffff',
+                                    textAlign: 'center',
+                                    fontSize: 16,
+                                    borderRadius: 4
+                                }
+                                });
+                            button.onTap((res) => {
+                                cc.log('success', res)
+                                that.btn_start.node.active = true;
+                                that.userName = that.code;
+                                cc.sys.localStorage.setItem("encryptedData", res.encryptedData);
+                                cc.sys.localStorage.setItem("iv", res.iv);
+                            })
                         }
-
-                    });*/
-                }
+                    }
+                });
             }
         });
     },
@@ -164,19 +148,6 @@ cc.Class({
         while(s.length< L) s+= randomchar();
         return s;
     },
-
-    loadItemPrefab: function() {
-        cc.loader.loadResArray(ItemPrefabUrl['map1'], cc.Prefab, function (err, prefabArray) {
-            if (err) {
-                cc.error("load item prefab error: " + err);
-                return;
-            }
-            for(var prefab of prefabArray) {
-                ItemPrefabMap[prefab.name] = prefab;
-            }
-           
-        });
-     },
 
      initKbengine: function() {
         var args = new KBEngine.KBEngineArgs();
@@ -269,11 +240,8 @@ cc.Class({
         KBEngine.INFO_MSG("Login is successfully!(登陆成功!)");
         this.label_hint.string = "登陆成功 !!!";
         
-        cc.director.loadScene("JumpScene", ()=> {
+        cc.director.loadScene("HallScene", ()=> {
             KBEngine.INFO_MSG("load jump scene finished");
-            var player = KBEngine.app.player();
-            if(player)
-                player.joinRoom();
         });
 
         this.unInstallEvents();

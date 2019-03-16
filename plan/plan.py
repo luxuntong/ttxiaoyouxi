@@ -20,12 +20,18 @@ class Plan(object):
             newname = prefix + '_' + table.name
             nrows = table.nrows
             dataDict = {}
+            dataType = 'float'
             for i in range(nrows):
                 data = table.row_values(i)
-                data = list(filter(lambda x: x, data))
+                if i == 0:
+                    dataType = data[1] if data[1] else dataType
+                data = list(filter(lambda x: type(x) != str or x, data))
                 if len(data) < 2:
                     continue
-
+                
+                if dataType == 'int':
+                    data[1] = int(data[1])
+                
                 dataDict[data[0]] = data[1]
 
             retStr = self.getJsContent(dataDict)

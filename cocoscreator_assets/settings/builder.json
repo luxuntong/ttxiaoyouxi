@@ -10,9 +10,7 @@
   "appKey": "",
   "appSecret": "",
   "encryptJs": true,
-  "excludeScenes": [
-    "659362c0-e251-46be-bfd9-a71f02e7e750"
-  ],
+  "excludeScenes": [],
   "fb-instant-games": {},
   "includeAnySDK": false,
   "includeSDKBox": false,
@@ -35,7 +33,7 @@
     "REMOTE_SERVER_ROOT": "",
     "orientation": "portrait"
   },
-  "startScene": "3d8e33dd-946c-44a0-b593-134f421bd764",
+  "startScene": "659362c0-e251-46be-bfd9-a71f02e7e750",
   "title": "cocoscreator_assets",
   "webOrientation": "auto",
   "wechatgame": {

@@ -6,10 +6,10 @@
 # ------------------------------------------------------------------------------
 # entity state
 # ------------------------------------------------------------------------------
-ENTITY_STATE_UNKNOW									= -1
-ENTITY_STATE_SAFE										= 0
-ENTITY_STATE_FREE										= 1
-ENTITY_STATE_MAX    									= 4
+ENTITY_STATE_UNKNOW                                    = -1
+ENTITY_STATE_SAFE                                        = 0
+ENTITY_STATE_FREE                                        = 1
+ENTITY_STATE_MAX                                        = 4
 
 
 #  一个房间最大人数

@@ -5,17 +5,25 @@ cc.Class({
         target: {
             default: null,
             type: cc.Node,
-        }
+        },
+        mode: 1,
+        isUp: 0
     },
     onLoad: function(){
-        var bg1 = cc.find("World/jp_bg_1");
-        var bg2 = cc.find("World/jp_bg_2");
-        console.log("bg1:", bg1);
-        console.log("bg2:", bg2);
-        console.log(this.node);
         this.vsSize = cc.view.getVisibleSize();
-
-
+        this.origin = cc.view.getVisibleOrigin()
+        if (this.mode == 1){
+            if (this.isUp){
+                this.node.y = 0;
+            }
+            else {
+                this.node.y = this.vsSize.height;
+            }
+        }
+        else {
+            this.node.y = this.vsSize.height / 2;
+        }
+        console.log('camera', this.node);
     },
     setTarget: function(target){
         this.target = target;

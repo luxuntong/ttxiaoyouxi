@@ -1,240 +1,253 @@
 <root>
-	<Properties>
-		<sessionKey>
-			<Type>		UNICODE		</Type>
-			<Flags>	 	BASE		</Flags>
-		</sessionKey>
+    <Properties>
+        <sessionKey>
+            <Type>        UNICODE        </Type>
+            <Flags>         BASE        </Flags>
+        </sessionKey>
 
-		<openId>
-			<Type>		UNICODE				</Type>
-			<Flags>	 	BASE				</Flags>
-		</openId>
+        <isInit>
+            <Type>        BOOL                   </Type>
+            <Flags>       BASE                   </Flags>
+            <Default>     0                      </Default>
+            <Persistent>  true                   </Persistent>
+        </isInit>
 
-		<modelID>
-			<Type>		UINT8			</Type>
-			<Flags>		ALL_CLIENTS			</Flags>
-			<Default>		0				</Default>
-		</modelID>
+        <gbID>
+            <Type>        GBID                   </Type>
+            <Flags>       BASE                   </Flags>
+            <Persistent>  true                   </Persistent>
+        </gbID>
 
-		<roomKey>
-			<Type>		SPACE_KEY			</Type>
-			<Flags>		BASE				</Flags>
-			<Persistent>		true				</Persistent>
-		</roomKey>
+        <openId>
+            <Type>        UNICODE                </Type>
+            <Flags>         BASE                </Flags>
+        </openId>
 
-		<accountName>
-			<Type>		UNICODE			</Type>
-			<Flags>		ALL_CLIENTS			</Flags>
-		</accountName>
+        <modelID>
+            <Type>        UINT8            </Type>
+            <Flags>        ALL_CLIENTS            </Flags>
+            <Default>        0                </Default>
+        </modelID>
 
-		<avatarName>
-			<Type>		UNICODE			</Type>
-			<Flags>		ALL_CLIENTS			</Flags>
-		</avatarName>
+        <roomKey>
+            <Type>        SPACE_KEY            </Type>
+            <Flags>        BASE                </Flags>
+            <Persistent>        true                </Persistent>
+        </roomKey>
 
-		<dbid>
-			<Type>		DBID				</Type>
-			<Flags>		CELL_PUBLIC			</Flags>
-			<Default>		0				</Default>
-		</dbid>
+        <accountName>
+            <Type>        UNICODE            </Type>
+            <Flags>        ALL_CLIENTS            </Flags>
+        </accountName>
 
-		<HP>
-			<Type>		INT32				</Type>
-			<Flags>		ALL_CLIENTS			</Flags>
-			<Default>		100				</Default>
-		</HP>
+        <avatarName>
+            <Type>        UNICODE            </Type>
+            <Flags>        ALL_CLIENTS            </Flags>
+        </avatarName>
 
-		<hitCount>
-			<Type>		INT32				</Type>
-			<Flags>	  CELL_PUBLIC_AND_OWN	</Flags>
-			<Default>		0				</Default>
-		</hitCount>
+        <dbid>
+            <Type>        DBID                </Type>
+            <Flags>        CELL_PUBLIC            </Flags>
+            <Default>        0                </Default>
+        </dbid>
 
-		<throwCount>
-			<Type>		INT32				</Type>
-			<Flags>	 CELL_PUBLIC_AND_OWN	</Flags>
-			<Default>		0				</Default>
-		</throwCount>
+        <HP>
+            <Type>        INT32                </Type>
+            <Flags>        ALL_CLIENTS            </Flags>
+            <Default>        100                </Default>
+        </HP>
 
-		<totalHarm>
-			<Type>		INT32				</Type>
-			<Flags>	  CELL_PUBLIC_AND_OWN	</Flags>
-			<Default>		0				</Default>
-		</totalHarm>
+        <hitCount>
+            <Type>        INT32                </Type>
+            <Flags>      CELL_PUBLIC_AND_OWN    </Flags>
+            <Default>        0                </Default>
+        </hitCount>
 
-		<totalTime>
-			<Type>		INT32				</Type>
-			<Flags>	  CELL_PUBLIC_AND_OWN	</Flags>
-			<Default>		0				</Default>
-		</totalTime>
+        <throwCount>
+            <Type>        INT32                </Type>
+            <Flags>     CELL_PUBLIC_AND_OWN    </Flags>
+            <Default>        0                </Default>
+        </throwCount>
 
-		<score>
-			<Type>		INT32				</Type>
-			<Flags>	 CELL_PUBLIC_AND_OWN	</Flags>
-			<Default>		0				</Default>
-		</score>
+        <totalHarm>
+            <Type>        INT32                </Type>
+            <Flags>      CELL_PUBLIC_AND_OWN    </Flags>
+            <Default>        0                </Default>
+        </totalHarm>
 
-		<hitRate>
-			<Type>		FLOAT				</Type>
-			<Flags>	 CELL_PUBLIC_AND_OWN	</Flags>
-			<Default>		0				</Default>
-		</hitRate>
+        <totalTime>
+            <Type>        INT32                </Type>
+            <Flags>      CELL_PUBLIC_AND_OWN    </Flags>
+            <Default>        0                </Default>
+        </totalTime>
 
-		<sessionId>
-			<Type>		STRING				</Type>
-			<Flags>	 	BASE				</Flags>
-		</sessionId>
+        <score>
+            <Type>        INT32                </Type>
+            <Flags>     CELL_PUBLIC_AND_OWN    </Flags>
+            <Default>        0                </Default>
+        </score>
 
-		<decryptedData>
-			<Type>		PY_DICT				</Type>
-			<Flags>	 	BASE				</Flags>
-		</decryptedData>
-	</Properties>
+        <hitRate>
+            <Type>        FLOAT                </Type>
+            <Flags>     CELL_PUBLIC_AND_OWN    </Flags>
+            <Default>        0                </Default>
+        </hitRate>
 
-	<ClientMethods>
-		<onDie>
-			<Arg>		ENTITY_ID	</Arg>
-		</onDie>
+        <sessionId>
+            <Type>        STRING                </Type>
+            <Flags>         BASE                </Flags>
+        </sessionId>
 
-		<onStartWalk>
-			<Arg>		INT32	</Arg>
-		</onStartWalk>
+        <decryptedData>
+            <Type>        PY_DICT                </Type>
+            <Flags>         BASE                </Flags>
+        </decryptedData>
+    </Properties>
 
-		<onStopWalk>
-			<Arg>		VECTOR3			</Arg>
-		</onStopWalk>
+    <ClientMethods>
+        <onDie>
+            <Arg>        ENTITY_ID    </Arg>
+        </onDie>
 
-		<onLeftJump>
-		</onLeftJump>
+        <onStartWalk>
+            <Arg>        INT32    </Arg>
+        </onStartWalk>
 
-		<onRightJump>
-		</onRightJump>
+        <onStopWalk>
+            <Arg>        VECTOR3            </Arg>
+        </onStopWalk>
 
-		<onPickUpItem>
-				<Arg>		ENTITY_ID		</Arg>
-				<Arg>		VECTOR3			</Arg>
-		</onPickUpItem>
+        <onLeftJump>
+        </onLeftJump>
 
-		<onThrowItem>
-				<Arg>		ENTITY_ID		</Arg>
-				<Arg>		VECTOR3			</Arg>
-		</onThrowItem>
+        <onRightJump>
+        </onRightJump>
 
-		<onNewTurn>
-				<Arg>		ENTITY_ID		</Arg>
-				<Arg>		INT32		    </Arg>
-		</onNewTurn>
+        <onPickUpItem>
+                <Arg>        ENTITY_ID        </Arg>
+                <Arg>        VECTOR3            </Arg>
+        </onPickUpItem>
 
-		<onRecoverItem>
-			<Arg>		ENTITY_ID	</Arg>
-		</onRecoverItem>
+        <onThrowItem>
+                <Arg>        ENTITY_ID        </Arg>
+                <Arg>        VECTOR3            </Arg>
+        </onThrowItem>
 
-		<onRecvDamage>
-			<Arg>		ENTITY_ID	</Arg>
-			<Arg>		INT32		</Arg>
-			<Arg>		INT32		</Arg>
-		</onRecvDamage>
-		
-		<onGameOver>
-			<Arg>		BOOL	</Arg>
-			<Arg>		FLOAT	</Arg>
-			<Arg>		INT32		</Arg>
-			<Arg>		INT32		</Arg>
-			<Arg>		INT32		</Arg>
-		</onGameOver>
+        <onNewTurn>
+                <Arg>        ENTITY_ID        </Arg>
+                <Arg>        INT32            </Arg>
+        </onNewTurn>
 
-		<onResetItem>
-			<Arg>		ENTITY_ID		</Arg>
-			<Arg>		VECTOR3			</Arg>
-		</onResetItem>
+        <onRecoverItem>
+            <Arg>        ENTITY_ID    </Arg>
+        </onRecoverItem>
 
-		<onContinueGame>
-			<Arg>		ENTITY_ID		</Arg>
-		</onContinueGame>
+        <onRecvDamage>
+            <Arg>        ENTITY_ID    </Arg>
+            <Arg>        INT32        </Arg>
+            <Arg>        INT32        </Arg>
+        </onRecvDamage>
 
-		<onJump>
-		</onJump>
-	</ClientMethods>
+        <onGameOver>
+            <Arg>        BOOL    </Arg>
+            <Arg>        FLOAT    </Arg>
+            <Arg>        INT32        </Arg>
+            <Arg>        INT32        </Arg>
+            <Arg>        INT32        </Arg>
+        </onGameOver>
 
-	<BaseMethods>
-		<createCell>
-			<Arg>	ENTITYCALL </Arg>
-		</createCell>
+        <onResetItem>
+            <Arg>        ENTITY_ID        </Arg>
+            <Arg>        VECTOR3            </Arg>
+        </onResetItem>
 
-		<joinRoom>
-			<Exposed/>
-		</joinRoom>
+        <onContinueGame>
+            <Arg>        ENTITY_ID        </Arg>
+        </onContinueGame>
 
-		<decodeEncryptedData>
-			<Exposed/>
-			<Arg>	UNICODE 	</Arg>
-			<Arg>	UNICODE 	</Arg>
-		</decodeEncryptedData>
-	</BaseMethods>
+        <onJump>
+        </onJump>
+    </ClientMethods>
 
-	<CellMethods>
-		<startWalk>
-			<Exposed/>
-			<Arg>		INT32	</Arg>
-		</startWalk>
+    <BaseMethods>
+        <createCell>
+            <Arg>    ENTITYCALL </Arg>
+        </createCell>
 
-		<stopWalk>
-			<Exposed/>
-			<Arg>		VECTOR3		</Arg>
-		</stopWalk>
+        <joinRoom>
+            <Exposed/>
+        </joinRoom>
 
-		<rightJump>
-			<Exposed/>
-		</rightJump>
+        <decodeEncryptedData>
+            <Exposed/>
+            <Arg>    UNICODE     </Arg>
+            <Arg>    UNICODE     </Arg>
+        </decodeEncryptedData>
+    </BaseMethods>
 
-		<leftJump>
-			<Exposed/>
-		</leftJump>
+    <CellMethods>
+        <startWalk>
+            <Exposed/>
+            <Arg>        INT32    </Arg>
+        </startWalk>
 
-		<pickUpItem>
-			<Exposed/>
-			<Arg>		ENTITY_ID		</Arg>
-			<Arg>		VECTOR3		</Arg>
-		</pickUpItem>
+        <stopWalk>
+            <Exposed/>
+            <Arg>        VECTOR3        </Arg>
+        </stopWalk>
 
-		<throwItem>
-			<Exposed/>
-			<Arg>		ENTITY_ID	</Arg>
-			<Arg>		VECTOR3		</Arg>
-		</throwItem>
+        <rightJump>
+            <Exposed/>
+        </rightJump>
 
-		<newTurn>
-			<Exposed/>
-		</newTurn>
+        <leftJump>
+            <Exposed/>
+        </leftJump>
 
-		<jump>
-			<Exposed/>
-		</jump>
+        <pickUpItem>
+            <Exposed/>
+            <Arg>        ENTITY_ID        </Arg>
+            <Arg>        VECTOR3        </Arg>
+        </pickUpItem>
 
-		<recoverItem>
-			<Exposed/>
-			<Arg>		ENTITY_ID	</Arg>
-		</recoverItem>
+        <throwItem>
+            <Exposed/>
+            <Arg>        ENTITY_ID    </Arg>
+            <Arg>        VECTOR3        </Arg>
+        </throwItem>
 
-		<recvDamage>
-			<Exposed/>
-			<Arg>		ENTITY_ID	</Arg>
-		</recvDamage>
+        <newTurn>
+            <Exposed/>
+        </newTurn>
 
-		<resetItem>
-			<Exposed/>
-			<Arg>		ENTITY_ID	</Arg>
-		</resetItem>
+        <jump>
+            <Exposed/>
+        </jump>
 
-		<addItem>
-			<Exposed/>
-			<Arg>		INT32	</Arg>
-		</addItem>
+        <recoverItem>
+            <Exposed/>
+            <Arg>        ENTITY_ID    </Arg>
+        </recoverItem>
 
-		<continueGame>
-			<Exposed/>
-		</continueGame>
-		
-	</CellMethods>
+        <recvDamage>
+            <Exposed/>
+            <Arg>        ENTITY_ID    </Arg>
+        </recvDamage>
+
+        <resetItem>
+            <Exposed/>
+            <Arg>        ENTITY_ID    </Arg>
+        </resetItem>
+
+        <addItem>
+            <Exposed/>
+            <Arg>        INT32    </Arg>
+        </addItem>
+
+        <continueGame>
+            <Exposed/>
+        </continueGame>
+
+    </CellMethods>
 
 </root>

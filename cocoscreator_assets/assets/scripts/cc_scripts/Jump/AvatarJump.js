@@ -2,6 +2,7 @@
 var AVATAR_STATE = require("gameconst");
 const SDD = require("single_data");
 var KBEngine = require("kbengine");
+const ITEMD = require("item_data");
 cc.Class({
     extends: cc.Component,
 
@@ -79,13 +80,20 @@ cc.Class({
         return cc.sequence(cc.spawn(jumpUp, rotateWithUp), cc.spawn(jumpDown, rotateWithDown));
     },
     onCollisionEnter: function(other, self){
-        console.log(other.node.flatIndex);
         if (other.name.startsWith("debuff")){
+            other.node.fatherObj.item = null;
             other.node.destroy();
+            this.getItem();
             return;
         }
     },
-
+    getItem: function(){
+        var itemType = 0;
+        console.log(itemType, ITEMD.flat_narrow);
+        if (itemType == ITEMD.flat_narrow){
+            this.world.pushAction(itemType);
+        }
+    },
     onSpacePressed: function() {
         this.inTheAir = true
         this.node.runAction(this.setJumpAction());
@@ -111,8 +119,6 @@ cc.Class({
         this.trueHeight = this.node.scaleY * this.node.height;
     }, 
     installEvents: function(){
-        this.pickTouchRange.on(cc.Node.EventType.MOUSE_DOWN, this.onMouseDown, this);
-        this.pickTouchRange.on(cc.Node.EventType.MOUSE_UP, this.onMouseUp, this);
         this.pickTouchRange.on(cc.Node.EventType.TOUCH_START, this.onMouseDown, this);
         this.pickTouchRange.on(cc.Node.EventType.TOUCH_END, this.onMouseUp, this);
     },
@@ -140,9 +146,10 @@ cc.Class({
         if (this.pressCost > 1500){
             this.pressCost = 1500;
         }
-        var angle = (this.pressCost * Math.PI / 1650) / 2;
-        var xSpeed = SDD.speed_base * Math.sin(angle);
-        var ySpeed = SDD.speed_base * Math.cos(angle);
+        this.pressCost += 200;
+        var angle = 40 * Math.PI / 180;
+        var xSpeed = this.pressCost * Math.sin(angle);
+        var ySpeed = this.pressCost * Math.cos(angle);
         this.yA = this.node.y;
         this.yB = ySpeed / 1000;
         this.yC = - SDD.gravity / 1000000;

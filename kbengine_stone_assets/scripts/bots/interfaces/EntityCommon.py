@@ -4,7 +4,7 @@ import KBExtra
 from KBEDebug import *
 
 class EntityCommon:
-	def __init__(self):
-		pass
-		
+    def __init__(self):
+        pass
+
 
