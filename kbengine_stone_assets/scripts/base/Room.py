@@ -6,10 +6,11 @@ import math
 from KBEDebug import *
 
 class RoomAvatarCacheVal(object):
-    def __init__(self, gbId, pos, direction, isIn=False):
+    def __init__(self, gbId, pos, direction, box, isIn=False):
         self.gbId = gbId
         self.pos = pos
         self.direction = direction
+        self.box = box
         self.isIn = isIn
 
 
@@ -33,18 +34,19 @@ class Room(KBEngine.Entity):
         defined method.
         请求进入某个space中
         """
-        DEBUG_MSG('ckz: room enterRoom', gbId)
-        raVal = RoomAvatarCacheVal(box, pos, direction)
+        DEBUG_MSG('ckz: room enterRoom', gbId, self.cell)
+        raVal = RoomAvatarCacheVal(gbId, pos, direction, box)
+        self.avatars[gbId] = raVal
         if self.cell:
             raVal.isIn = True
             box.createCell(self.cell)
 
-    def leaveRoom(self, entityID):
+    def leaveRoom(self, gbId):
         """
         defined method.
         某个玩家请求退出这个space
         """
-        self.onLeave(entityID)
+        self.onLeave(gbId)
 
     def onTimer(self, tid, userArg):
         """
@@ -54,14 +56,14 @@ class Room(KBEngine.Entity):
         pass
 
 
-    def onLeave(self, entityID):
+    def onLeave(self, gbId):
         """
         defined method.
         离开场景
         """
-        if entityID in self.avatars:
-            DEBUG_MSG("Room::onLeave: entityID=%i" % (entityID))
-            del self.avatars[entityID]
+        if gbId in self.avatars:
+            DEBUG_MSG("Room::onLeave: gbId=%i" % (gbId))
+            del self.avatars[gbId]
 
 
     def onLoseCell(self):

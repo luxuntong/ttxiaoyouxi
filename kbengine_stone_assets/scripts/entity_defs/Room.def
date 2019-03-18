@@ -26,10 +26,6 @@
             <Arg>        ENTITY_ID        </Arg>
         </leaveRoom>
 
-        <onEnter>
-            <Arg>        ENTITYCALL        </Arg>
-        </onEnter>
-
         <onLeave>
             <Arg>        ENTITY_ID        </Arg>
         </onLeave>

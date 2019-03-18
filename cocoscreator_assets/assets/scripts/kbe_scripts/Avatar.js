@@ -23,15 +23,14 @@ KBEngine.Avatar = KBEngine.Entity.extend({
                 this.baseCall("decodeEncryptedData", encryptedData, iv);
             }
         },
-
-        joinRoom: function()
-        {
-            KBEngine.INFO_MSG("avatar " + this.id + " join room");
-            this.baseCall("joinRoom");
+        matchCoop: function() {
+            KBEngine.INFO_MSG("avatar " + this.id + " match coop");
+            this.baseCall("matchCoop");
         },
                    
         onEnterWorld : function()
         {
+            KBEngine.DEBUG_MSG("avatar onenter world");
             this._super();
             if(this.isPlayer()) {
                 KBEngine.Event.fire("onAvatarEnterWorld", this);

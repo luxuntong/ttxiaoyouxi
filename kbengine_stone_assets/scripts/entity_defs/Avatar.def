@@ -18,6 +18,12 @@
             <Persistent>  true                   </Persistent>
         </gbID>
 
+        <gbIdc>
+            <Type>        GBID                   </Type>
+            <Flags>       CELL_PRIVATE           </Flags>
+            <Persistent>  true                   </Persistent>
+        </gbIdc>
+
         <openId>
             <Type>        UNICODE                </Type>
             <Flags>         BASE                </Flags>
@@ -174,9 +180,8 @@
             <Arg>    ENTITYCALL </Arg>
         </createCell>
 
-        <joinRoom>
-            <Exposed/>
-        </joinRoom>
+        <matchCoop> <Exposed/>
+        </matchCoop>
 
         <decodeEncryptedData>
             <Exposed/>
@@ -186,67 +191,10 @@
     </BaseMethods>
 
     <CellMethods>
-        <startWalk>
-            <Exposed/>
-            <Arg>        INT32    </Arg>
-        </startWalk>
-
-        <stopWalk>
-            <Exposed/>
-            <Arg>        VECTOR3        </Arg>
-        </stopWalk>
-
-        <rightJump>
-            <Exposed/>
-        </rightJump>
-
-        <leftJump>
-            <Exposed/>
-        </leftJump>
-
-        <pickUpItem>
-            <Exposed/>
-            <Arg>        ENTITY_ID        </Arg>
-            <Arg>        VECTOR3        </Arg>
-        </pickUpItem>
-
-        <throwItem>
-            <Exposed/>
-            <Arg>        ENTITY_ID    </Arg>
-            <Arg>        VECTOR3        </Arg>
-        </throwItem>
-
-        <newTurn>
-            <Exposed/>
-        </newTurn>
 
         <jump>
             <Exposed/>
         </jump>
-
-        <recoverItem>
-            <Exposed/>
-            <Arg>        ENTITY_ID    </Arg>
-        </recoverItem>
-
-        <recvDamage>
-            <Exposed/>
-            <Arg>        ENTITY_ID    </Arg>
-        </recvDamage>
-
-        <resetItem>
-            <Exposed/>
-            <Arg>        ENTITY_ID    </Arg>
-        </resetItem>
-
-        <addItem>
-            <Exposed/>
-            <Arg>        INT32    </Arg>
-        </addItem>
-
-        <continueGame>
-            <Exposed/>
-        </continueGame>
 
     </CellMethods>
 

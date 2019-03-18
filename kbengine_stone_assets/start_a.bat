@@ -3,6 +3,9 @@ set curpath=%~dp0
 
 cd ..
 @rem set KBE_ROOT=%cd%
+set KBE_ROOT=G:/github/CPP/kbeNew/
+@rem set KBE_ROOT=G:/github/CPP/kbengine/kbengine/
+echo %KBE_ROOT%
 set KBE_RES_PATH=%KBE_ROOT%/kbe/res/;%curpath%/;%curpath%/scripts/;%curpath%/res/
 set KBE_BIN_PATH=%KBE_ROOT%/kbe/bin/server/
 
@@ -12,6 +15,7 @@ cd %curpath%
 call "kill_server.bat"
 del logs\*.log
 taskkill /im guiconsole.exe /f
+echo "hello"
 echo KBE_ROOT = %KBE_ROOT%
 echo KBE_RES_PATH = %KBE_RES_PATH%
 echo KBE_BIN_PATH = %KBE_BIN_PATH%

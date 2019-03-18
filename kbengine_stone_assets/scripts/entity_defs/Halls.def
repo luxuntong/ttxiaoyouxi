@@ -6,26 +6,9 @@
     </ClientMethods>
 
     <BaseMethods>
-        <enterRoom>
-            <Arg>        ENTITYCALL        </Arg>
-            <Arg>        POSITION3D        </Arg>
-            <Arg>        DIRECTION3D        </Arg>
-            <Arg>        SPACE_KEY        </Arg>
-        </enterRoom>
-
-        <leaveRoom>
-            <Arg>        ENTITY_ID        </Arg>
-            <Arg>        SPACE_KEY        </Arg>
-        </leaveRoom>
-
         <onRoomLoseCell>
             <Arg>        SPACE_KEY        </Arg>
         </onRoomLoseCell>
-
-        <onRoomGetCell>
-            <Arg>        ENTITYCALL        </Arg>
-            <Arg>        SPACE_KEY        </Arg>
-        </onRoomGetCell>
     </BaseMethods>
 
     <CellMethods>

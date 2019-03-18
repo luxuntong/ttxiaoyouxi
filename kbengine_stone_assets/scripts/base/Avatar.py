@@ -48,10 +48,10 @@ class Avatar(KBEngine.Proxy):
     def initFirst(self):
         self.isInit = 1
         self.gbID = KBEngine.genUUID64()
+        self.cellData['gbIdc'] = self.gbID
 
     def initNotSaveProp(self):
         self.roomUUID = 0
-        self.roomKey = 0
         self.roomBox = None
 
     def createCell(self, space):
@@ -76,7 +76,10 @@ class Avatar(KBEngine.Proxy):
             self.destroyCellEntity()
             return
 
-        KBEngine.globalData["Halls"].leaveRoom(self.id, self.roomKey)
+        if self.roomBox:
+            self.roomBox.leaveRoom(self.gbID)
+        else:
+            KBEngine.globalData["Halls"].onAvatarDestroy(self.gbID)
 
         # 销毁base
         self.destroy()
@@ -148,16 +151,15 @@ class Avatar(KBEngine.Proxy):
     def matchCoop(self):
         DEBUG_MSG('ckz: matchCoop')
         if self.roomUUID:
+            ERROR_MSG('ckz: im in room:', self.gbID, self.roomUUID)
             return
 
         KBEngine.globalData["Halls"].matchCoop(self, self.gbID)
 
-    def onGetRoom(self, roomKey, roomBox):
-        self.roomKey = roomKey
+    def onGetRoom(self, roomUUID, roomBox):
+        self.roomUUID = roomUUID
         self.roomBox = roomBox
-
-    def joinRoom(self):
-        return
+        roomBox.enterRoom(self, None, None, self.gbID)
 
     def onDestroyTimer(self):
         DEBUG_MSG("Avatar::onDestroyTimer: %i" % (self.id))
