@@ -109,7 +109,10 @@ cc.Class({
     },
     onAvatarEnterWorld: function(avatar){
         KBEngine.DEBUG_MSG("onAvatarEnterWorld", avatar)
-
+        cc.director.loadScene("CoopScene", ()=> {
+            KBEngine.INFO_MSG("load jump scene finished");
+        });
+        this.unInstallEvents();
     },
     onAvatarContinueGame: function(avatar){
         KBEngine.DEBUG_MSG("onAvatarContinueGame", avatar)
