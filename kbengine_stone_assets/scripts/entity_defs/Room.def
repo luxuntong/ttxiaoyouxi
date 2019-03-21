@@ -10,6 +10,11 @@
             <Type>            SPACE_KEY            </Type>
             <Flags>            CELL_PUBLIC            </Flags>
         </roomKeyC>
+
+        <roomSeed>
+            <Type>          SEED                    </Type>
+            <Flags>         CELL_PRIVATE            </Flags>
+        </roomSeed>
     </Properties>
 
     <ClientMethods>

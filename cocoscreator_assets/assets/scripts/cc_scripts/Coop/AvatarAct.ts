@@ -13,10 +13,16 @@ export class NewClass extends cc.Component {
     private stateControl: cc.Node = null;
 
     @property(cc.Node)
-    private world: cc.Node = null;
+    protected world: cc.Node = null;
 
-    private trueWidth = 0;
-    private trueHeight = 0;
+    protected startPos: cc.Vec2 = null;
+
+    protected trueWidth = 0;
+    protected trueHeight = 0;
+    protected isPlayer:boolean = false;
+    protected eid: number = 0;
+    protected pressCost: number = 0;
+
     protected onKeyDown(event) {
         console.log("key:", event);
         switch(event.keyCode) {
@@ -27,8 +33,16 @@ export class NewClass extends cc.Component {
                 break;
         }
     }
+
+    public setEid(eid){
+        this.eid = eid;
+    }
     
     // LIFE-CYCLE CALLBACKS:
+
+    public setStartPos(pos){
+        this.startPos = pos;
+    }
 
     // onLoad () {},
     protected onCollisionEnter(other, self){
@@ -51,18 +65,18 @@ export class NewClass extends cc.Component {
         this.pickTouchRange = pickTouchRange;
         this.stateControl = stateCtl;
     }
+    public setIsPlayer(isPlayer){
+        this.isPlayer = isPlayer;
+    }
 
     public init() {
         this.initSize();
-        this.initComp();
         this.installEvents();
         this.reset();
     }
 
-    protected initComp (){
-        this.pickTouchRange = cc.find("touchRange");
-        this.world = cc.find("World").getComponent("JumpScene");
-        this.stateControl = this.node.getComponent("AvatarState");
+    onDestroy(){
+
     }
 
     protected initSize (){
@@ -73,8 +87,24 @@ export class NewClass extends cc.Component {
     }
 
     protected installEvents (){
-        this.pickTouchRange.on(cc.Node.EventType.TOUCH_START, this.onMouseDown, this);
-        this.pickTouchRange.on(cc.Node.EventType.TOUCH_END, this.onMouseUp, this);
+        if (this.isPlayer){
+            this.pickTouchRange.on(cc.Node.EventType.TOUCH_START, this.onMouseDown, this);
+            this.pickTouchRange.on(cc.Node.EventType.TOUCH_END, this.onMouseUp, this);
+        }
+        else {
+		    KBEngine.Event.register("otherAvatarOnJump", this, "otherAvatarOnJump");
+        }
+    }
+
+    protected otherAvatarOnJump(eid, pressCount){
+        console.log('ckz: other jump:', eid, pressCount);
+        if (eid != this.eid){
+            KBEngine.ERROR_MSG('eid wrong ' + eid + ' ' + this.eid);
+            return;
+        }
+        this.stateControl.setState(AVATAR_STATE.storage);
+        this.stateControl.setState(AVATAR_STATE.fly);
+        this.doJump(pressCount);
     }
     
     protected onMouseDown (event){
@@ -92,33 +122,42 @@ export class NewClass extends cc.Component {
             return;
         }
 
-        var now = new Date();
+        let now = new Date();
         this.pressCost = now.valueOf() - this.pressTime;
         console.log("ckz press", this.pressCost);
-        if (this.pressCost > 1500){
-            this.pressCost = 1500;
+        this.doJump(this.pressCost);
+        let player = KBEngine.app.player();
+        if(player != undefined && player.inWorld && player.id == this.eid) {
+            player.jump(this.pressCost);
         }
-        this.pressCost += 200;
-        var angle = 40 * Math.PI / 180;
-        var xSpeed = this.pressCost * Math.sin(angle);
-        var ySpeed = this.pressCost * Math.cos(angle);
+    }
+    protected doJump(pressCount) {
+        if (pressCount > 1500){
+            pressCount = 1500;
+        }
+        pressCount += 200;
+        let angle = 40 * Math.PI / 180;
+        let xSpeed = pressCount * Math.sin(angle);
+        let ySpeed = pressCount * Math.cos(angle);
         this.yA = this.node.y;
         this.yB = ySpeed / 1000;
         this.yC = - SDD.gravity / 1000000;
         this.xA = this.node.x;
         this.xB = xSpeed / 1000;
-        var tCost = - this.yB / this.yC;
+        let tCost = - this.yB / this.yC;
         this.finalX = this.xA + tCost * this.xB;
         this.curIndex = this.world.getFlatIndex(this.finalX);
         this.releaseTime = (new Date()).valueOf();
+
     }
     protected completed (isWin){
         this.world.onCompleted(isWin);
     }
     public reset() {
-        KBEngine.DEBUG_MSG("ckz reset!")
-        this.node.x = -475;
-        this.node.y = this.world.getAvatarY() + this.trueHeight / 2;
+        console.log("ckz entity reset:", this.eid);
+        this.node.x = this.startPos.x;
+        this.node.y = this.startPos.y + this.trueHeight / 2;
+        console.log('ckz: player now:', this.startPos, this.trueHeight, this.node);
         this.stateControl.reset();
     }
     protected update (dt){

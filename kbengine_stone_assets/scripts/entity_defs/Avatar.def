@@ -60,6 +60,11 @@
             <Type>        PY_DICT                </Type>
             <Flags>         BASE                </Flags>
         </decryptedData>
+
+        <seed>
+            <Type>        UINT16                </Type>
+            <Flags>       ALL_CLIENTS           </Flags>
+        </seed>
     </Properties>
 
     <ClientMethods>
@@ -124,6 +129,7 @@
         </onContinueGame>
 
         <onJump>
+            <Arg>    UINT16         </Arg>
         </onJump>
     </ClientMethods>
 
@@ -143,11 +149,9 @@
     </BaseMethods>
 
     <CellMethods>
-
-        <jump>
-            <Exposed/>
+        <jump> <Exposed/>
+            <Arg>   UINT16          </Arg>
         </jump>
-
     </CellMethods>
 
 </root>

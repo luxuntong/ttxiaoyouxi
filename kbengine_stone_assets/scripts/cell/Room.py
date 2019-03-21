@@ -31,6 +31,7 @@ class Room(KBEngine.Entity):
         DEBUG_MSG('created space[%d] entityID = %i spaceid=%i' % (self.roomKeyC, self.id, self.spaceID))
 
         KBEngine.globalData["Room_%i" % self.spaceID] = self.base
+        self.roomSeed = random.randint(0, 60000)
 
     def onDestroy(self):
         """
@@ -47,6 +48,9 @@ class Room(KBEngine.Entity):
         DEBUG_MSG('Room::onEnter space[%d] entityID = %i.' %
                   (self.spaceID, entityCall.id), entityCall.__class__.__name__)
         className = entityCall.__class__.__name__
+        if className == 'Avatar':
+            entityCall.onSetRoomSeed(self.roomSeed)
+
         self.tags.setdefault(className, [])
         self.tags[className].append(entityCall.id)
         self.entities[entityCall.id] = entityCall

@@ -27,6 +27,9 @@ class Avatar(KBEngine.Entity, EntityCommon):
     def onTimer(self, tid, userArg):
         pass
 
+    def onSetRoomSeed(self, roomSeed):
+        self.seed = roomSeed
+
     def onGetWitness(self):
         """
         KBEngine method.
@@ -52,7 +55,7 @@ class Avatar(KBEngine.Entity, EntityCommon):
         if room:
             room.onLeave(self.id)
 
-    def jump(self, exposed):
+    def jump(self, exposed, pressCount):
         """
         defined.
         玩家跳跃 我们广播这个行为
@@ -61,7 +64,7 @@ class Avatar(KBEngine.Entity, EntityCommon):
         if exposed != self.id:
             return
         DEBUG_MSG("avatar %i start jump" % (self.id))
-        self.otherClients.onJump()
+        self.otherClients.onJump(pressCount)
 
     def leaveRoom(self, exposed):
         pass
