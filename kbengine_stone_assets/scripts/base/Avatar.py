@@ -16,17 +16,9 @@ class Avatar(KBEngine.Proxy):
         KBEngine.Proxy.__init__(self)
 
         self.cellData["dbid"] = self.databaseID
-        self.cellData["modelID" ] = 0
+        self.cellData["modelID"] = 0
         self.cellData["accountName"] = self.__ACCOUNT_NAME__
-        self.cellData["position"] =  None
-        self.cellData["HP"] = GameConfigs.PLAYER_HP
-        self.cellData["harmCount"] = 0
-        self.cellData["throwCount"] = 0
-        self.cellData["totalHarm"] = 0
-        self.cellData["hitCount"] = 0
-        self.cellData["totalTime"] = 0
-        self.cellData["score"] = 0
-        self.cellData["hitRate"] = 0.0
+        self.cellData["position"] = (-475, 0, -69)
         self.cellData["avatarName"] = ""
 
         datas = self.getClientDatas()

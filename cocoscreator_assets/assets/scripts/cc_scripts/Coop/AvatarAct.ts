@@ -1,45 +1,23 @@
-
+const {ccclass, property} = cc._decorator;
 var AVATAR_STATE = require("gameconst");
 const SDD = require("single_data");
 var KBEngine = require("kbengine");
 const ITEMD = require("item_data");
-cc.Class({
-    extends: cc.Component,
 
-    properties: {
-        // 主角跳跃高度
-        // 主角跳跃持续时间
-        // 最大移动速度
-        pickTouchRange: {
-            default: null,
-            type: cc.Node,
-        },
-        stateControl: {
-            default: null,
-            type: cc.Node,
-        },
-        world: {
-            default: null,
-            type: cc.Node,
-        },
-        // foo: {
-        //     // ATTRIBUTES:
-        //     default: null,        // The default value will be used only when the component attaching
-        //                           // to a node for the first time
-        //     type: cc.SpriteFrame, // optional, default is typeof default
-        //     serializable: true,   // optional, default is true
-        // },
-        // bar: {
-        //     get () {
-        //         return this._bar;
-        //     },
-        //     set (value) {
-        //         this._bar = value;
-        //     }
-        // },
-    },
+@ccclass
+export class NewClass extends cc.Component {
+    @property(cc.Node)
+    private pickTouchRange: cc.Node = null;
 
-    onKeyDown: function (event) {
+    @property(cc.Node)
+    private stateControl: cc.Node = null;
+
+    @property(cc.Node)
+    private world: cc.Node = null;
+
+    private trueWidth = 0;
+    private trueHeight = 0;
+    protected onKeyDown(event) {
         console.log("key:", event);
         switch(event.keyCode) {
             case cc.macro.KEY.a:
@@ -48,54 +26,58 @@ cc.Class({
             case cc.macro.KEY.space:
                 break;
         }
-    },
+    }
     
     // LIFE-CYCLE CALLBACKS:
 
     // onLoad () {},
-    onCollisionEnter: function(other, self){
+    protected onCollisionEnter(other, self){
         if (other.name.startsWith("debuff")){
             other.node.fatherObj.item = null;
             other.node.destroy();
             this.getItem();
             return;
         }
-    },
-    getItem: function(){
+    }
+    protected getItem(){
         var itemType = 0;
         console.log(itemType, ITEMD.flat_narrow);
         if (itemType == ITEMD.flat_narrow){
             this.world.pushAction(itemType);
         }
-    },
+    }
+    public setNode(world, pickTouchRange, stateCtl){
+        this.world = world;
+        this.pickTouchRange = pickTouchRange;
+        this.stateControl = stateCtl;
+    }
 
-    start () {
+    public init() {
         this.initSize();
         this.initComp();
-        this.notifyPlayerIn();
         this.installEvents();
         this.reset();
-    },
-    initComp: function(){
+    }
+
+    protected initComp (){
         this.pickTouchRange = cc.find("touchRange");
         this.world = cc.find("World").getComponent("JumpScene");
         this.stateControl = this.node.getComponent("AvatarState");
-        this.rigid = this.node.getComponent(cc.RigidBody);
-    },
-    initSize: function(){
+    }
+
+    protected initSize (){
         this.node.scaleX = SDD.avatar_scale_x;
         this.node.scaleY = SDD.avatar_scale_y;
         this.trueWidth = this.node.scaleX * this.node.width;
         this.trueHeight = this.node.scaleY * this.node.height;
-    }, 
-    installEvents: function(){
+    }
+
+    protected installEvents (){
         this.pickTouchRange.on(cc.Node.EventType.TOUCH_START, this.onMouseDown, this);
         this.pickTouchRange.on(cc.Node.EventType.TOUCH_END, this.onMouseUp, this);
-    },
-    notifyPlayerIn: function(){
-        this.world.onPlayerEnter(this.node);
-    },
-    onMouseDown: function(event){
+    }
+    
+    protected onMouseDown (event){
         this.stateControl.printState();
         if(!this.stateControl.setState(AVATAR_STATE.storage))
         {
@@ -103,8 +85,8 @@ cc.Class({
         }
         var now = new Date();
         this.pressTime = now.valueOf();
-    },
-    onMouseUp: function(event){
+    }
+    protected onMouseUp (event){
         if(!this.stateControl.setState(AVATAR_STATE.fly))
         {
             return;
@@ -129,19 +111,17 @@ cc.Class({
         this.finalX = this.xA + tCost * this.xB;
         this.curIndex = this.world.getFlatIndex(this.finalX);
         this.releaseTime = (new Date()).valueOf();
-    },
-    completed: function(isWin){
+    }
+    protected completed (isWin){
         this.world.onCompleted(isWin);
-    },
-    reset: function(){
+    }
+    public reset() {
         KBEngine.DEBUG_MSG("ckz reset!")
-        this.rigid.gravityScale = 0;
-        this.rigid.linearVelocity = cc.v2(0, 0);
         this.node.x = -475;
         this.node.y = this.world.getAvatarY() + this.trueHeight / 2;
         this.stateControl.reset();
-    },
-    update: function(dt){
+    }
+    protected update (dt){
         if (this.stateControl.getState(AVATAR_STATE.fly)){
             var tCost = (new Date()).valueOf() - this.releaseTime;
             var y = this.yA + this.yB * tCost + this.yC * tCost * tCost;
@@ -164,4 +144,4 @@ cc.Class({
         }
     }
     // update (dt) {},
-});
+}

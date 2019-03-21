@@ -75,3 +75,4 @@ logs
 *.pyc
 *.project
 /plan/*.pydevproject
+node_modules
