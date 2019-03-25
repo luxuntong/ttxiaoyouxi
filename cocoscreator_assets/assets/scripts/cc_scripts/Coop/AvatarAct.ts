@@ -4,6 +4,10 @@ const SDD = require("single_data");
 var KBEngine = require("kbengine");
 const ITEMD = require("item_data");
 
+const ActionType = {
+    jump: 0
+}
+
 @ccclass
 export class NewClass extends cc.Component {
     @property(cc.Node)
@@ -22,6 +26,15 @@ export class NewClass extends cc.Component {
     protected isPlayer:boolean = false;
     protected eid: number = 0;
     protected pressCost: number = 0;
+    protected yA: number = 0;
+    protected yB: number = 0;
+    protected yC: number = 0;
+    protected xA: number = 0;
+    protected xB: number = 0;
+    protected finalPos: cc.Vec2 = null;
+    protected curIndex: number = 0;
+    protected releaseTime = 0;
+    protected actionList: Array<any> = null;
 
     protected onKeyDown(event) {
         console.log("key:", event);
@@ -70,6 +83,7 @@ export class NewClass extends cc.Component {
     }
 
     public init() {
+        this.actionList = new Array();
         this.initSize();
         this.installEvents();
         this.reset();
@@ -96,19 +110,48 @@ export class NewClass extends cc.Component {
         }
     }
 
-    protected otherAvatarOnJump(eid, pressCount){
-        console.log('ckz: other jump:', eid, pressCount);
+    protected otherAvatarOnJump(eid, pressCount, finalPos, curIndex){
+        console.log('ckz: other jump:', eid, pressCount, finalPos, curIndex);
         if (eid != this.eid){
             KBEngine.ERROR_MSG('eid wrong ' + eid + ' ' + this.eid);
             return;
         }
+
+        this.actionList.push({
+            type: ActionType.jump,
+            pressCount: pressCount,
+            finalPos: finalPos,
+            curIndex: curIndex
+        });
+        if (this.stateControl.getState(AVATAR_STATE.idle)) {
+            this.doAction();
+        }
+    }
+
+    protected doAction() {
+        if (!this.actionList.length) {
+            return;
+        }
+        let action = this.actionList.shift();
+        switch (action.type) {
+            case ActionType.jump:
+                this.doJumpAction(action);
+                break;
+        }
+        
+    }
+
+    protected doJumpAction(action) {
         this.stateControl.setState(AVATAR_STATE.storage);
         this.stateControl.setState(AVATAR_STATE.fly);
-        this.doJump(pressCount);
+        this.doJump(action.pressCount);
+        this.finalPos = cc.v2(action.finalPos[0], action.finalPos[1]);
+        this.curIndex = action.curIndex;
     }
+
     
     protected onMouseDown (event){
-        this.stateControl.printState();
+        //this.stateControl.printState();
         if(!this.stateControl.setState(AVATAR_STATE.storage))
         {
             return;
@@ -124,11 +167,11 @@ export class NewClass extends cc.Component {
 
         let now = new Date();
         this.pressCost = now.valueOf() - this.pressTime;
-        console.log("ckz press", this.pressCost);
+        //console.log("ckz press", this.pressCost);
         this.doJump(this.pressCost);
         let player = KBEngine.app.player();
         if(player != undefined && player.inWorld && player.id == this.eid) {
-            player.jump(this.pressCost);
+            player.jump(this.pressCost, [this.finalPos.x, this.finalPos.y], this.curIndex);
         }
     }
     protected doJump(pressCount) {
@@ -145,8 +188,9 @@ export class NewClass extends cc.Component {
         this.xA = this.node.x;
         this.xB = xSpeed / 1000;
         let tCost = - this.yB / this.yC;
-        this.finalX = this.xA + tCost * this.xB;
-        this.curIndex = this.world.getFlatIndex(this.finalX);
+        let finalX = this.xA + tCost * this.xB;
+        this.finalPos = cc.v2(finalX, this.yA);
+        this.curIndex = this.world.getFlatIndex(finalX);
         this.releaseTime = (new Date()).valueOf();
 
     }
@@ -157,6 +201,7 @@ export class NewClass extends cc.Component {
         console.log("ckz entity reset:", this.eid);
         this.node.x = this.startPos.x;
         this.node.y = this.startPos.y + this.trueHeight / 2;
+        this.curIndex = 0;
         console.log('ckz: player now:', this.startPos, this.trueHeight, this.node);
         this.stateControl.reset();
     }
@@ -166,11 +211,12 @@ export class NewClass extends cc.Component {
             var y = this.yA + this.yB * tCost + this.yC * tCost * tCost;
             var x = this.xA + tCost * this.xB;
             if (this.curIndex != -1 && y < this.yA){
-                this.node.y = this.yA;
-                this.node.x = this.finalX;
+                this.node.y = this.finalPos.y;
+                this.node.x = this.finalPos.x;
                 
                 this.stateControl.setState(AVATAR_STATE.idle);
-                this.world.onPlayerLanded(this.curIndex);
+                this.world.onPlayerLanded(this.eid);
+                this.doAction();
             }
             else{
                 this.node.y = y;

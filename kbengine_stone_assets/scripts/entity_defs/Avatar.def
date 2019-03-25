@@ -130,6 +130,8 @@
 
         <onJump>
             <Arg>    UINT16         </Arg>
+            <Arg>   ARRAY <of>   FLOAT   </of>         </Arg>
+            <Arg>   INT32                   </Arg>
         </onJump>
     </ClientMethods>
 
@@ -150,7 +152,9 @@
 
     <CellMethods>
         <jump> <Exposed/>
-            <Arg>   UINT16          </Arg>
+            <Arg>   UINT16                  </Arg>
+            <Arg>   ARRAY <of>   FLOAT   </of>         </Arg>
+            <Arg>   INT32                   </Arg>
         </jump>
     </CellMethods>
 

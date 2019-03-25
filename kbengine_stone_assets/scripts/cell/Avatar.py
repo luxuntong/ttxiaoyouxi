@@ -55,7 +55,7 @@ class Avatar(KBEngine.Entity, EntityCommon):
         if room:
             room.onLeave(self.id)
 
-    def jump(self, exposed, pressCount):
+    def jump(self, exposed, pressCount, finalPos, curIndex):
         """
         defined.
         玩家跳跃 我们广播这个行为
@@ -64,7 +64,7 @@ class Avatar(KBEngine.Entity, EntityCommon):
         if exposed != self.id:
             return
         DEBUG_MSG("avatar %i start jump" % (self.id))
-        self.otherClients.onJump(pressCount)
+        self.otherClients.onJump(pressCount, finalPos, curIndex)
 
     def leaveRoom(self, exposed):
         pass

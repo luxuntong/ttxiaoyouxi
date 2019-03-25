@@ -10,6 +10,9 @@ cc.Class({
         isUp: 0
     },
     onLoad: function(){
+    },
+    init: function(isUp){
+        this.isUp = isUp;
         this.vsSize = cc.view.getVisibleSize();
         this.origin = cc.view.getVisibleOrigin()
         if (this.mode == 1){
@@ -27,6 +30,7 @@ cc.Class({
     },
     setTarget: function(target){
         this.target = target;
+        console.log('ckz target:', target);
     },
     lateUpdate: function(dt){
         if (this.target == null){
@@ -35,7 +39,9 @@ cc.Class({
         
         let targetPos = this.target.convertToWorldSpaceAR(cc.Vec2.ZERO);
         var point = this.node.parent.convertToNodeSpaceAR(targetPos);
-        //console.log("pos:", this.node.x, this.node.parent.x, this.target.x, targetPos.x, point.x, this.vsSize);
+        //if (this.isUp)
+            //console.log(this.target);
+            //console.log("pos:", this.node.x, this.node.parent.x, this.target.x, targetPos.x, point.x, this.vsSize);
         var limitDiff = this.vsSize.width / 2 - 100;
         if (this.node.x < point.x){
             this.node.x = point.x;

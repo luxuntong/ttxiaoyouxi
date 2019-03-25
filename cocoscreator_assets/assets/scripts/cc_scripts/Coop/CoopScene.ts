@@ -2,6 +2,7 @@ const {ccclass, property} = cc._decorator;
 import KBEngine = require("kbengine")
 import SDD = require("single_data");
 import ITEMD = require("item_data");
+import {randomIndex, RandomIndex} from "./RandomIndex"
 
 //var seedrandom = require('seedrandom');
 //import {KBEngine} from "kbengine"
@@ -36,7 +37,7 @@ export class NewClass extends cc.Component {
     private cameraDown: cc.Camera = null;
 
     protected flatStart = -480;
-    protected flatList = null;
+    protected flats = null;
     protected flatY = -179
     protected flatIndex = 0;
     protected seed: number = -1;
@@ -46,12 +47,14 @@ export class NewClass extends cc.Component {
     protected curIndex: number = -1;
     protected high: number = 0;
     protected entities: Array<cc.Node> = null;
+    protected randomIndex = 0;
 
     protected onLoad(){
         //console.log('ckz coop load', seedrandom.random(500));
         this.installEvents();
         this.initEntities();
         this.initFlat();
+        this.initDisplay();
         
     }
     protected initDisplay() {
@@ -89,8 +92,10 @@ export class NewClass extends cc.Component {
         aAct.setIsPlayer(false);
         aAct.setEid(entity.id);
         aAct.init();
+        e['act'] = aAct;
         let cameraCtl = this.cameraUp.addComponent('JumpCamera');
         cameraCtl.setTarget(e);
+        cameraCtl.init(true);
     }
     protected createPlayer(avatar) {
         if (this.player){
@@ -98,6 +103,7 @@ export class NewClass extends cc.Component {
         }
 
         this.player = cc.instantiate(this.playerPrefab);
+        this.entities.push(this.player);
         let aState = this.player.addComponent("AvatarState");
         let aAct = this.player.addComponent("AvatarAct");
         this.playerJump = aAct;
@@ -107,8 +113,10 @@ export class NewClass extends cc.Component {
         aAct.setIsPlayer(true);
         aAct.setEid(avatar.id);
         aAct.init();
+        this.player['act'] = aAct;
         let cameraCtl = this.cameraDown.addComponent('JumpCamera');
         cameraCtl.setTarget(this.player);
+        cameraCtl.init(false)
     }
 
     protected installEvents(){
@@ -204,28 +212,32 @@ export class NewClass extends cc.Component {
             KBEngine.ERROR_MSG('ckz seed == 0')
         }
         this.flatStart = -480;
-        this.flatList = new Array();
+        this.flats = {};
         this.flatIndex = 0;
         for (let i = 0; i < 10; i ++){
-            let x = this.flatStart;
-            if (i){
-                x = this.randomPosX(x);
-            }
-            let newPos = cc.v2(x, this.flatY);
-            this.flatList.push(this.createFlat(newPos, i));
-            this.flatStart += SDD.flat_spacing;
+            this.flats[i] = this.createFlatFromIndex(i);
         }
     }
     protected randomPosX(x){
         let halfRange = SDD.flat_x_random_range / 2;
-        return x - halfRange + SDD.flat_x_random_range * this.srand(this.getNewSeed());
+        return x - halfRange + SDD.flat_x_random_range * this.randomFromIndex(RandomIndex.flat_posx);
+    }
+
+    protected createFlatFromIndex(index) {
+        this.randomIndex = index;
+        let x = this.flatStart + index * SDD.flat_spacing;
+        if (index) {
+            x = this.randomPosX(x)
+        }
+        let newPos = cc.v2(x, this.flatY);
+        return this.createFlat(newPos, index);
     }
 
     protected createFlat (pos, isHasItem){
         let newFlat = cc.instantiate(this.flatPrefab);
         this.node.addChild(newFlat);
         newFlat.setPosition(pos);
-        newFlat.scaleX = 1 + SDD.flat_random_width * this.srand(this.getNewSeed());
+        newFlat.scaleX = 1 + SDD.flat_random_width * this.randomFromIndex(RandomIndex.flat_scalex);
         newFlat['flatIndex'] = this.flatIndex++;
         let obj = {
             flat: newFlat,
@@ -238,13 +250,13 @@ export class NewClass extends cc.Component {
     }
 
     protected randomItem(pos, flat, fatherObj) {
-        let randValue = this.srand(this.getNewSeed())
+        let randValue = this.randomFromIndex(RandomIndex.has_item)
         if (randValue < 0.4){
             let flatWidth = flat.scaleX * flat.width;
             let newItem = cc.instantiate(this.itemPrefab);
             newItem.scaleX = SDD.item_scale_x;
             newItem.scaleY = SDD.item_scale_y;
-            let newX = pos.x - flatWidth / 2 + flatWidth * this.srand(this.getNewSeed());
+            let newX = pos.x - flatWidth / 2 + flatWidth * this.randomFromIndex(RandomIndex.item_posx);
             let newPos = cc.v2(newX, this.getSurfaceHigh(flat) + newItem.height * newItem.scaleY / 2);
             this.node.addChild(newItem);
             newItem.setPosition(newPos);
@@ -269,6 +281,10 @@ export class NewClass extends cc.Component {
         return seed / (233280.0);
     }
 
+    public randomFromIndex(index) {
+        return this.srand(this.seed + this.randomIndex * 10 + index);
+    }
+
     protected getAvatarY() {
         return this.flatY + this.flatPrefab.data.height / 2;
     }
@@ -277,11 +293,12 @@ export class NewClass extends cc.Component {
     }
 
     public getFlatIndex(x) {
-        for (let flat of this.flatList){
+        for (let fIndex in this.flats){
+            let flat = this.flats[fIndex];
             let flatX = flat.flat.x;
             let half = this.getTrueWidth(flat.flat) / 2;
             if ((x >= flatX - half) && (x <= flatX + half)){
-                return flat.flat.flatIndex;
+                return parseInt(fIndex);
             }
         }
         return -1;
@@ -290,7 +307,7 @@ export class NewClass extends cc.Component {
         if (!isWin){
             this.playerJump.reset();
             this.resetEntities();
-            //this.reset();
+            this.reset();
         }
     }
     protected resetEntities() {
@@ -312,46 +329,63 @@ export class NewClass extends cc.Component {
         this.actionList = new Array();
     }
     protected destroyAllFlat() {
-        for (let flat of this.flatList){
-            flat.flat.destroy();
-            if (flat.item){
-                flat.item.destroy();
+        console.log('destroy all');
+        for (let fIndex in this.flats){
+            this.destroyFlat(fIndex);
+        }
+    }
+    protected isFlatInUse(fIndex){
+        for (let e of this.entities) {
+            if (fIndex >= e.act.curIndex - 2 && fIndex <= e.act.curIndex + 10)
+            {
+                return true;
             }
         }
-        this.flatList.length = 0;
+        return false;
     }
 
-    public onPlayerLanded(index) {
-        var score = index;
-        this.curIndex = index;
-        this.curScoreDisplay.string = 'cur: ' + score;
-        if (score > this.high){
-            this.high = score;
-            this.highScoreDisplay.string = 'high: ' + this.high;
-        }
-        for (var i in this.flatList){
-            var flat = this.flatList[i]
-            if (flat.flat.flatIndex == index){
-                console.log("onPlayerLanded", i)
-                //this.destroyBeforeFlat(i);
-                //this.fullOfFlat();
-                break;
-            }
-        }
-        //this.doItemAction();
-    }
-    protected destroyBeforeFlat(nowIndex) {
-        var eraseIndex = nowIndex - 2;
-        if (eraseIndex < 0){
-            return;
+    //清除屏幕外平板
+    protected destroyFlat(index) {
+        console.log('clear fIndex:', index);
+        let flat = this.flats[index];
+        flat.flat.destroy();
+        if (flat.item){
+            flat.item.destroy();
         }
 
-        for (var i = 0; i <= eraseIndex; i++){
-            var flat = this.flatList.shift();
-            flat.flat.destroy();
-            if (flat.item){
-                flat.item.destroy();
+        delete this.flats[index];
+    }
+    protected clearFlat(){
+        for (let fIndex in this.flats) {
+            if (!this.isFlatInUse(fIndex)) {
+                this.destroyFlat(fIndex);
             }
         }
+    }
+
+    protected fullOfFlat() {
+        for (let e of this.entities) {
+            let start = e.act.curIndex;
+            for (let i = start; i <= start + 10; i++){
+                if (!(i in this.flats)) {
+                    this.flats[i] = this.createFlatFromIndex(i);
+                }
+            }
+        }
+    }
+
+    public onPlayerLanded (eid) {
+        if (eid == this.player.act.eid)
+        {
+            let index = this.player.act.curIndex;
+            this.curScoreDisplay.string = 'cur:' + index;
+            if (index > this.high) {
+                this.high = index;
+                this.highScoreDisplay.string = 'high:' + index;
+            }
+        }
+
+        this.clearFlat();
+        this.fullOfFlat();
     }
 }
