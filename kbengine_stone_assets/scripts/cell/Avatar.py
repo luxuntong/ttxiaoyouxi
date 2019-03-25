@@ -4,8 +4,11 @@ from KBEDebug import *
 import GameUtils
 import GameConfigs
 import random
+import math
 import copy
 from interfaces.EntityCommon import EntityCommon
+
+import single_data as SDD
 
 
 class Avatar(KBEngine.Entity, EntityCommon):
@@ -14,6 +17,8 @@ class Avatar(KBEngine.Entity, EntityCommon):
         EntityCommon.__init__(self)
         self.startPosition = copy.deepcopy(self.position)
         self.getCurrRoom().onEnter(self)
+        self.curPos = (self.position[0], self.position[2])
+        self.curIndex = 0
         DEBUG_MSG("new avatar cell: id=%i accountName=%s  avatarName=%s spaceID=%i" % (self.id, self.accountName, self.avatarName, self.spaceID))
 
     def isAvatar(self):
@@ -65,6 +70,19 @@ class Avatar(KBEngine.Entity, EntityCommon):
             return
         DEBUG_MSG("avatar %i start jump" % (self.id))
         self.otherClients.onJump(pressCount, finalPos, curIndex)
+
+    def _calcJump(self, pressCount):
+        pressCount += 200
+        angle = 40 * math.pi / 180
+        xSpeed = pressCount * math.sin(angle)
+        ySpeed = pressCount * math.cos(angle)
+        yB = ySpeed / 1000
+        yC = - SDD.gravity / 1000000
+        xA = self.curPos[0]
+        xB = xSpeed / 1000
+        tCost = - yB / yC
+        finalX = xA + tCost * xB
+        return finalX
 
     def leaveRoom(self, exposed):
         pass

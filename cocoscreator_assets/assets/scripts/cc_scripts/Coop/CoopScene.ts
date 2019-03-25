@@ -2,7 +2,7 @@ const {ccclass, property} = cc._decorator;
 import KBEngine = require("kbengine")
 import SDD = require("single_data");
 import ITEMD = require("item_data");
-import {randomIndex, RandomIndex} from "./RandomIndex"
+import RIDD = require("random_index_data")
 
 //var seedrandom = require('seedrandom');
 //import {KBEngine} from "kbengine"
@@ -36,7 +36,7 @@ export class NewClass extends cc.Component {
     @property(cc.Camera)
     private cameraDown: cc.Camera = null;
 
-    protected flatStart = -480;
+    protected flatStart = 0;
     protected flats = null;
     protected flatY = -179
     protected flatIndex = 0;
@@ -211,7 +211,7 @@ export class NewClass extends cc.Component {
         if (this.seed == 0){
             KBEngine.ERROR_MSG('ckz seed == 0')
         }
-        this.flatStart = -480;
+        this.flatStart = SDD.flat_start;
         this.flats = {};
         this.flatIndex = 0;
         for (let i = 0; i < 10; i ++){
@@ -220,7 +220,7 @@ export class NewClass extends cc.Component {
     }
     protected randomPosX(x){
         let halfRange = SDD.flat_x_random_range / 2;
-        return x - halfRange + SDD.flat_x_random_range * this.randomFromIndex(RandomIndex.flat_posx);
+        return x - halfRange + SDD.flat_x_random_range * this.randomFromIndex(RIDD.flat_posx);
     }
 
     protected createFlatFromIndex(index) {
@@ -237,7 +237,7 @@ export class NewClass extends cc.Component {
         let newFlat = cc.instantiate(this.flatPrefab);
         this.node.addChild(newFlat);
         newFlat.setPosition(pos);
-        newFlat.scaleX = 1 + SDD.flat_random_width * this.randomFromIndex(RandomIndex.flat_scalex);
+        newFlat.scaleX = 1 + SDD.flat_random_width * this.randomFromIndex(RIDD.flat_scalex);
         newFlat['flatIndex'] = this.flatIndex++;
         let obj = {
             flat: newFlat,
@@ -250,13 +250,13 @@ export class NewClass extends cc.Component {
     }
 
     protected randomItem(pos, flat, fatherObj) {
-        let randValue = this.randomFromIndex(RandomIndex.has_item)
+        let randValue = this.randomFromIndex(RIDD.has_item)
         if (randValue < 0.4){
             let flatWidth = flat.scaleX * flat.width;
             let newItem = cc.instantiate(this.itemPrefab);
             newItem.scaleX = SDD.item_scale_x;
             newItem.scaleY = SDD.item_scale_y;
-            let newX = pos.x - flatWidth / 2 + flatWidth * this.randomFromIndex(RandomIndex.item_posx);
+            let newX = pos.x - flatWidth / 2 + flatWidth * this.randomFromIndex(RIDD.item_posx);
             let newPos = cc.v2(newX, this.getSurfaceHigh(flat) + newItem.height * newItem.scaleY / 2);
             this.node.addChild(newItem);
             newItem.setPosition(newPos);
@@ -282,7 +282,7 @@ export class NewClass extends cc.Component {
     }
 
     public randomFromIndex(index) {
-        return this.srand(this.seed + this.randomIndex * 10 + index);
+        return this.srand(this.seed + this.randomIndex * SDD.random_range + index);
     }
 
     protected getAvatarY() {

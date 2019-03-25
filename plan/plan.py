@@ -118,7 +118,7 @@ class Plan(object):
             if fileName in self.specialDict:
                 funcName = self.specialDict[fileName]
                 getattr(self, funcName)(fileName)
-                return
+                continue
 
             self.generate(fileName)
 

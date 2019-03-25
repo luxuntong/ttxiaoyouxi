@@ -3,6 +3,8 @@ import KBEngine
 from KBEDebug import *
 import GameConfigs
 import random
+import single_data as SDD
+import random_index_data as RIDD
 import GameUtils
 
 TIMER_TYPE_DESTROY = 1
@@ -92,3 +94,30 @@ class Room(KBEngine.Entity):
 
     def findEntityByID(self, ID):
         return self.entities[ID]
+
+    def _srand(self, seed):
+        seed = (seed + 60001) % 60001
+        seed = (seed * 9301 + 49297) % 233280
+        return seed / 233280.0
+
+    def _randomFromIndex(self, index, randomIndex):
+        return self._srand(self.roomSeed + index * SDD.random_range + randomIndex)
+
+    def _getFlatPosX(self, index):
+        x = SDD.falt_start + index * SDD.flat_spacing
+        return self._centerRandom(x, SDD.flat_x_random_range, self._randomFromIndex(index, RIDD.flat_posx))
+
+    def _getFlatWidth(self, index):
+        scaleX = 1 + SDD.flat_random_width * self._randomFromIndex(index, RIDD.flat_scalex)
+        return 200 * scaleX
+
+    def isInFlat(self, x, index):
+        posX = self._getFlatPosX(index)
+        width = self._getFlatWidth(index)
+        half = width / 2
+        return posX - half < x < posX + half
+
+    def _centerRandom(self, center, diameter, randomValue):
+        radius = diameter / 2
+        return center - radius + diameter * randomValue
+
