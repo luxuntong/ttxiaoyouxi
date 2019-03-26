@@ -1,5 +1,5 @@
 const {ccclass, property} = cc._decorator;
-var AVATAR_STATE = require("gameconst");
+var AVATAR_STATE = require("conflict_data_state");
 const SDD = require("single_data");
 var KBEngine = require("kbengine");
 const ITEMD = require("item_data");
@@ -35,6 +35,7 @@ export class NewClass extends cc.Component {
     protected curIndex: number = 0;
     protected releaseTime = 0;
     protected actionList: Array<any> = null;
+    protected wiatJumpFlag = false;
 
     protected onKeyDown(event) {
         console.log("key:", event);
@@ -104,9 +105,22 @@ export class NewClass extends cc.Component {
         if (this.isPlayer){
             this.pickTouchRange.on(cc.Node.EventType.TOUCH_START, this.onMouseDown, this);
             this.pickTouchRange.on(cc.Node.EventType.TOUCH_END, this.onMouseUp, this);
+            KBEngine.Event.register("onJumpResult", this, "onJumpResult");
         }
         else {
 		    KBEngine.Event.register("otherAvatarOnJump", this, "otherAvatarOnJump");
+        }
+    }
+
+    protected onJumpResult(eid, ret) {
+        console.log('ckz jump result:', ret);
+        if (eid != this.eid){
+            KBEngine.ERROR_MSG('eid wrong ' + eid + ' ' + this.eid);
+            return;
+        }
+
+        if (ret){
+            this.wiatJumpFlag = false;
         }
     }
 
@@ -151,6 +165,10 @@ export class NewClass extends cc.Component {
 
     
     protected onMouseDown (event){
+        if (this.wiatJumpFlag) {
+            KBEngine.ERROR_MSG("you not get jump flag!")
+            return;
+        }
         //this.stateControl.printState();
         if(!this.stateControl.setState(AVATAR_STATE.storage))
         {
@@ -168,8 +186,9 @@ export class NewClass extends cc.Component {
         let now = new Date();
         this.pressCost = now.valueOf() - this.pressTime;
         //console.log("ckz press", this.pressCost);
-        this.doJump(this.pressCost);
+        this.pressCost = this.doJump(this.pressCost);
         let player = KBEngine.app.player();
+        this.wiatJumpFlag = true;
         if(player != undefined && player.inWorld && player.id == this.eid) {
             player.jump(this.pressCost, [this.finalPos.x, this.finalPos.y], this.curIndex);
         }
@@ -192,7 +211,7 @@ export class NewClass extends cc.Component {
         this.finalPos = cc.v2(finalX, this.yA);
         this.curIndex = this.world.getFlatIndex(finalX);
         this.releaseTime = (new Date()).valueOf();
-
+        return pressCount;
     }
     protected completed (isWin){
         this.world.onCompleted(isWin);

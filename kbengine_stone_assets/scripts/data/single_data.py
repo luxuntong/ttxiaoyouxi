@@ -7,5 +7,5 @@ item_scale_x = 0.2
 item_scale_y = 0.2
 gravity = 1000.0
 speed_base = 1200.0
-falt_start = -480.0
+flat_start = -480.0
 random_range = 10.0

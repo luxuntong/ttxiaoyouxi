@@ -72,8 +72,11 @@ KBEngine.Avatar = KBEngine.Entity.extend({
 	    {
             cc.log("avatar %d cell jump", this.id);
 		    this.cellCall("jump", pressCount, finalPos, curIndex);
-        }, 
-
+        },
+        onJumpResult: function(ret)
+        {
+		    KBEngine.Event.fire("onJumpResult", this.id, ret);
+        },
         onJump : function(pressCount, finalPos, curIndex)
 	    {
             cc.log("other avatar %d on jump", this.id);

@@ -1,4 +1,5 @@
 var KBEngine = require("kbengine")
+const STATE_CONFLICT = require("conflict_data");
 const STATE_CHANGE = {
     doubleSave: 0,
     change: 1,
@@ -9,12 +10,6 @@ const STATE_CHANGE = {
  * 1： 切换并重置
  * 2： 不能切换
  */
-const STATE_CONFLICT = [
-    [2, 2, 1, 1],
-    [1, 2, 2, 2],
-    [2, 1, 2, 2],
-    [2, 2, 2, 2]
-];
 cc.Class({
     extends: cc.Component,
 

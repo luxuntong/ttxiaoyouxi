@@ -225,7 +225,7 @@ export class NewClass extends cc.Component {
 
     protected createFlatFromIndex(index) {
         this.randomIndex = index;
-        let x = this.flatStart + index * SDD.flat_spacing;
+        let x = SDD.flat_start + index * SDD.flat_spacing;
         if (index) {
             x = this.randomPosX(x)
         }

@@ -67,7 +67,7 @@
         </seed>
 
         <curIndex>
-            <Type>          UINT16              </Type>
+            <Type>          INT16              </Type>
             <Flags>         CELL_PUBLIC         </Flags>
             <Default>       0                   </Default>
         </curIndex>
@@ -144,6 +144,10 @@
             <Arg>   ARRAY <of>   FLOAT   </of>         </Arg>
             <Arg>   INT32                   </Arg>
         </onJump>
+
+        <onJumpResult>
+            <Arg>   BOOL            </Arg>
+        </onJumpResult>
     </ClientMethods>
 
     <BaseMethods>

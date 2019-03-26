@@ -66,7 +66,7 @@ class Room(KBEngine.Entity):
         """
         if TIMER_TYPE_GAME_START == userArg:
             self.startGame()
-            #开始回合倒计时
+            # 开始回合倒计时
             self.newTurnTimer = self.addTimer(
                 GameConfigs.PLAY_TIME_PER_TURN, 0, TIMER_TYPE_NEXT_PLAYER)
             DEBUG_MSG("Time to Game Start, newTurnTimer=%i" % (self.newTurnTimer))
@@ -104,14 +104,21 @@ class Room(KBEngine.Entity):
         return self._srand(self.roomSeed + index * SDD.random_range + randomIndex)
 
     def _getFlatPosX(self, index):
-        x = SDD.falt_start + index * SDD.flat_spacing
+        x = SDD.flat_start + index * SDD.flat_spacing
         return self._centerRandom(x, SDD.flat_x_random_range, self._randomFromIndex(index, RIDD.flat_posx))
 
     def _getFlatWidth(self, index):
         scaleX = 1 + SDD.flat_random_width * self._randomFromIndex(index, RIDD.flat_scalex)
         return 200 * scaleX
 
-    def isInFlat(self, x, index):
+    def getFlatIndexByPos(self, x, startIndex):
+        for i in range(startIndex, startIndex + 20):
+            if self._isInFlat(x, i):
+                return i
+
+        return -1
+
+    def _isInFlat(self, x, index):
         posX = self._getFlatPosX(index)
         width = self._getFlatWidth(index)
         half = width / 2
@@ -120,4 +127,8 @@ class Room(KBEngine.Entity):
     def _centerRandom(self, center, diameter, randomValue):
         radius = diameter / 2
         return center - radius + diameter * randomValue
+
+    def onNotifyReset(self):
+        for entityCall in self.entities.values():
+            entityCall.reset()
 

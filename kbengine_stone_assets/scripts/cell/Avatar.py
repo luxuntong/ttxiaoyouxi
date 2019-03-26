@@ -17,8 +17,7 @@ class Avatar(KBEngine.Entity, EntityCommon):
         EntityCommon.__init__(self)
         self.startPosition = copy.deepcopy(self.position)
         self.getCurrRoom().onEnter(self)
-        self.curPos = (self.position[0], self.position[2])
-        self.curIndex = 0
+        self.reset()
         DEBUG_MSG("new avatar cell: id=%i accountName=%s  avatarName=%s spaceID=%i" % (self.id, self.accountName, self.avatarName, self.spaceID))
 
     def isAvatar(self):
@@ -69,10 +68,37 @@ class Avatar(KBEngine.Entity, EntityCommon):
         if exposed != self.id:
             return
         DEBUG_MSG("avatar %i start jump" % (self.id))
+        finalX = self._calcJump(pressCount)
+        if abs(finalX - finalPos[0]) > 0.01:
+            ERROR_MSG('check pos error:', self.curPos, pressCount, finalX, finalPos)
+            self.client.onJumpResult(False)
+            self.otherClients.onJump(pressCount, finalPos, -1)
+            self._notifyRoomReset()
+            return
+
+        retIndex = self.getCurrRoom().getFlatIndexByPos(finalPos[0], self.curIndex)
+        if retIndex != curIndex:
+            ERROR_MSG('ckz ret index check failed:;', retIndex, curIndex)
+            self.otherClients.onJump(pressCount, finalPos, -1)
+            self._notifyRoomReset()
+            return
+
         self.otherClients.onJump(pressCount, finalPos, curIndex)
+        self.curPos = finalPos
+        self.curIndex = curIndex
+        self.client.onJumpResult(True)
+        if curIndex == -1:
+            self._notifyRoomReset()
+
+    def _notifyRoomReset(self):
+        self.getCurrRoom().onNotifyReset()
+
+    def reset(self):
+        self.curPos = (self.position[0], self.position[2])
+        self.curIndex = 0
+
 
     def _calcJump(self, pressCount):
-        pressCount += 200
         angle = 40 * math.pi / 180
         xSpeed = pressCount * math.sin(angle)
         ySpeed = pressCount * math.cos(angle)
