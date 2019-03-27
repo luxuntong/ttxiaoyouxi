@@ -55,7 +55,7 @@ class Room(KBEngine.Entity):
 
         self.tags.setdefault(className, [])
         self.tags[className].append(entityCall.id)
-        self.entities[entityCall.id] = entityCall
+        self.entities[entityCall.id] = entityCall.id
 
     def onTimer(self, id, userArg):
         """
@@ -118,6 +118,9 @@ class Room(KBEngine.Entity):
 
         return -1
 
+    def isHasItem(self, index):
+        return self._randomFromIndex(index, RIDD.has_item) < SDD.item_create_prob
+
     def _isInFlat(self, x, index):
         posX = self._getFlatPosX(index)
         width = self._getFlatWidth(index)
@@ -128,7 +131,14 @@ class Room(KBEngine.Entity):
         radius = diameter / 2
         return center - radius + diameter * randomValue
 
+    def _getEntityById(self, id):
+        return KBEngine.entities.get(id)
+
     def onNotifyReset(self):
-        for entityCall in self.entities.values():
-            entityCall.reset()
+        for eid in self.tags['Avatar']:
+            entity = self._getEntityById(eid)
+            if not entity:
+                continue
+
+            entity.reset()
 

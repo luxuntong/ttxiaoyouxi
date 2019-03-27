@@ -67,18 +67,10 @@ class Avatar(KBEngine.Entity, EntityCommon):
         DEBUG_MSG("receive avavtar %i jump, selfID=%i" % (exposed, self.id))
         if exposed != self.id:
             return
-        DEBUG_MSG("avatar %i start jump" % (self.id))
-        finalX = self._calcJump(pressCount)
-        if abs(finalX - finalPos[0]) > 0.01:
-            ERROR_MSG('check pos error:', self.curPos, pressCount, finalX, finalPos)
-            self.client.onJumpResult(False)
-            self.otherClients.onJump(pressCount, finalPos, -1)
-            self._notifyRoomReset()
-            return
 
-        retIndex = self.getCurrRoom().getFlatIndexByPos(finalPos[0], self.curIndex)
-        if retIndex != curIndex:
-            ERROR_MSG('ckz ret index check failed:;', retIndex, curIndex)
+        if not self._jumpCheck(pressCount, finalPos, curIndex):
+            ERROR_MSG('check jump error:', self.curPos, pressCount, finalPos)
+            self.client.onJumpResult(False)
             self.otherClients.onJump(pressCount, finalPos, -1)
             self._notifyRoomReset()
             return
@@ -90,13 +82,27 @@ class Avatar(KBEngine.Entity, EntityCommon):
         if curIndex == -1:
             self._notifyRoomReset()
 
+    def _jumpCheck(self, pressCount, finalPos, curIndex):
+        finalX = self._calcJump(pressCount)
+        if abs(finalX - finalPos[0]) > 0.01:
+            return False
+
+        curRoom = self.getCurrRoom()
+        if not curRoom:
+            return False
+
+        retIndex = curRoom.getFlatIndexByPos(finalPos[0], self.curIndex)
+        if retIndex != curIndex:
+            return False
+
+        return True
+
     def _notifyRoomReset(self):
         self.getCurrRoom().onNotifyReset()
 
     def reset(self):
         self.curPos = (self.position[0], self.position[2])
         self.curIndex = 0
-
 
     def _calcJump(self, pressCount):
         angle = 40 * math.pi / 180
@@ -112,3 +118,15 @@ class Avatar(KBEngine.Entity, EntityCommon):
 
     def leaveRoom(self, exposed):
         pass
+
+    def getItem(self, exposed, index):
+        DEBUG_MSG('get item:', exposed, index)
+        if exposed != self.id:
+            ERROR_MSG('getItem exposed invalid:', exposed)
+            return
+
+        curRoom = self.getCurrRoom()
+        if not curRoom:
+            ERROR_MSG('get item cur room failed!')
+            return
+

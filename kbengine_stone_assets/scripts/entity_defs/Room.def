@@ -13,8 +13,14 @@
 
         <roomSeed>
             <Type>          SEED                    </Type>
-            <Flags>         CELL_PRIVATE            </Flags>
+            <Flags>         CELL_PUBLIC             </Flags>
         </roomSeed>
+
+        <itemGetSet>
+            <Type>          PYTHON                  </Type>
+            <Default>       set()                   </Default>
+            <Flags>         CELL_PUBLIC             </Flags>
+        </itemGetSet>
     </Properties>
 
     <ClientMethods>

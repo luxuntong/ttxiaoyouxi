@@ -251,7 +251,7 @@ export class NewClass extends cc.Component {
 
     protected randomItem(pos, flat, fatherObj) {
         let randValue = this.randomFromIndex(RIDD.has_item)
-        if (randValue < 0.4){
+        if (randValue < SDD.item_create_prob){
             let flatWidth = flat.scaleX * flat.width;
             let newItem = cc.instantiate(this.itemPrefab);
             newItem.scaleX = SDD.item_scale_x;

@@ -9,6 +9,7 @@ const datas = {
     gravity: 1000.0,
     speed_base: 1200.0,
     flat_start: -480.0,
-    random_range: 10.0
+    random_range: 10.0,
+    item_create_prob: 0.4
 };
 module.exports = datas;
