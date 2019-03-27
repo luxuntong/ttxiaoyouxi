@@ -12,4 +12,4 @@ const datas = {
     random_range: 10.0,
     item_create_prob: 0.4
 };
-module.exports = datas;
+export {datas};

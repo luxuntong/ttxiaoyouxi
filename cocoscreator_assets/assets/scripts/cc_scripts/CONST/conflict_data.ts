@@ -4,4 +4,4 @@ const STATE_CONFLICT = [
     [2, 1, 2, 2],
     [2, 2, 2, 2]
 ];
-module.exports = STATE_CONFLICT;
+export {STATE_CONFLICT};

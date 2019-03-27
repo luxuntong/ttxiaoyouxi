@@ -37,7 +37,7 @@ class Plan(object):
                 dataDict[data[0]] = data[1]
 
             retStr = self.getJsContent(dataDict)
-            jsName = newname + '.js'
+            jsName = newname + '.ts'
             jsName = os.path.join(self.jsDir, jsName)
             with open(jsName, 'w') as fw:
                 fw.write(retStr)
@@ -56,7 +56,7 @@ class Plan(object):
 
         dataStr = ',\n    '.join(dataList)
         strRet += dataStr
-        strRet += '\n};\nmodule.exports = datas;'
+        strRet += '\n};\nexport {datas};'
         return strRet
 
     def getPyContent(self, dataDict):
@@ -90,13 +90,13 @@ class Plan(object):
                 stateDict[stName] = index
 
             writeStr = self.getJsContent(stateDict)
-            jsName = newname + '_state.js'
+            jsName = newname + '_state.ts'
             jsName = os.path.join(self.jsDir, jsName)
             with open(jsName, 'w') as fw:
                 fw.write(writeStr)
 
             writeStr = self.getConlictJS(conflicts)
-            jsName = newname + '.js'
+            jsName = newname + '.ts'
             jsName = os.path.join(self.jsDir, jsName)
             with open(jsName, 'w') as fw:
                 fw.write(writeStr)
@@ -109,7 +109,7 @@ class Plan(object):
             dataList.append(cData)
 
         data = 'const STATE_CONFLICT = [\n    ' + ',\n    '.join(dataList) +\
-               '\n];\nmodule.exports = STATE_CONFLICT;'
+               '\n];\nexport {STATE_CONFLICT};'
         return data
 
     def test(self):
@@ -124,6 +124,6 @@ class Plan(object):
 
 
 if __name__ == '__main__':
-    plan = Plan('.', r'..\cocoscreator_assets\assets\scripts',
+    plan = Plan('.', r'..\cocoscreator_assets\assets\scripts\cc_scripts\CONST',
                 r'..\kbengine_stone_assets\scripts\data')
     plan.test()

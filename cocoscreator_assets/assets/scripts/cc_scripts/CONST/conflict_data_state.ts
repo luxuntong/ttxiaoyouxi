@@ -4,4 +4,4 @@ const datas = {
     fly: 2,
     waitResult: 3
 };
-module.exports = datas;
+export {datas};

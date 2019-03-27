@@ -4,4 +4,4 @@ const datas = {
     has_item: 2,
     item_posx: 3
 };
-module.exports = datas;
+export {datas};

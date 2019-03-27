@@ -1,8 +1,8 @@
 const {ccclass, property} = cc._decorator;
-var AVATAR_STATE = require("conflict_data_state");
-const SDD = require("single_data");
 var KBEngine = require("kbengine");
-const ITEMD = require("item_data");
+import {datas as AVATAR_STATE} from "../CONST/conflict_data_state";
+import {datas as ITEMD} from "../CONST/item_data"
+import {datas as SDD} from "../CONST/single_data";
 
 const ActionType = {
     jump: 0
@@ -185,6 +185,7 @@ export class NewClass extends cc.Component {
 
         let now = new Date();
         this.pressCost = now.valueOf() - this.pressTime;
+        this.pressCost = this.preDealPress(this.pressCost);
         //console.log("ckz press", this.pressCost);
         this.pressCost = this.doJump(this.pressCost);
         let player = KBEngine.app.player();
@@ -193,11 +194,14 @@ export class NewClass extends cc.Component {
             player.jump(this.pressCost, [this.finalPos.x, this.finalPos.y], this.curIndex);
         }
     }
-    protected doJump(pressCount) {
-        if (pressCount > 1500){
-            pressCount = 1500;
+    protected preDealPress(pressCost) {
+        if (pressCost > 1500){
+            pressCost = 1500;
         }
-        pressCount += 200;
+        return pressCost + 200;
+    }
+
+    protected doJump(pressCount) {
         let angle = 40 * Math.PI / 180;
         let xSpeed = pressCount * Math.sin(angle);
         let ySpeed = pressCount * Math.cos(angle);

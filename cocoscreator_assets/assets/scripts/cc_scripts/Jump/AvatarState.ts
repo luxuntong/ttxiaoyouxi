@@ -1,5 +1,6 @@
+const {ccclass, property} = cc._decorator;
 var KBEngine = require("kbengine")
-const STATE_CONFLICT = require("conflict_data");
+import {STATE_CONFLICT} from "../CONST/conflict_data"
 const STATE_CHANGE = {
     doubleSave: 0,
     change: 1,
@@ -10,15 +11,13 @@ const STATE_CHANGE = {
  * 1： 切换并重置
  * 2： 不能切换
  */
-cc.Class({
-    extends: cc.Component,
+@ccclass
+export class AvatarState extends cc.Component {
+    protected state:number = 1;
+    onLoad(){
 
-    properties: {
-        state: 1
-    },
-    onLoad: function(){
-    },
-    checkSetState: function(statePos){
+    }
+    protected checkSetState(statePos){
         //console.log("check statePos:", statePos, STATE_CONFLICT);
         var conflictList = STATE_CONFLICT[statePos];
         for (var oriPos = 0; oriPos < conflictList.length; oriPos++){
@@ -33,8 +32,8 @@ cc.Class({
             }
         }
         return true;
-    },
-    setState: function(statePos){
+    }
+    protected setState(statePos){
         if (!this.checkSetState(statePos)){
             return false;
         }
@@ -42,8 +41,8 @@ cc.Class({
         this.cleanConflict(statePos);
         this.bitSet(statePos);
         return true;
-    },
-    cleanConflict: function(statePos){
+    }
+    protected cleanConflict(statePos){
         var conflictList = STATE_CONFLICT[statePos];
         for (var oriPos = 0; oriPos < conflictList.length; oriPos++){
             if (!this.getState(oriPos)){
@@ -54,22 +53,20 @@ cc.Class({
                 this.bitReset(oriPos);
             }
         }
-    },
-    bitSet: function(statePos){
+    }
+    protected bitSet(statePos){
         this.state |= 1 << statePos;
-    },
-    bitReset: function(statePos){
+    }
+    protected bitReset(statePos){
         this.state &= ~(1 << statePos);
-    },
-    getState: function(statePos){
+    }
+    protected getState(statePos){
         return this.state & (1 << statePos);
-    },
-    reset: function(){
+    }
+    protected reset(){
         this.state = 1;
-    },
-    printState: function(){
+    }
+    protected printState(){
         console.log("print state:", this.state);
     }
-
-    // update (dt) {},
-});
+};

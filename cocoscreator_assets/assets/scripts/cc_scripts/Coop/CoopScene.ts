@@ -1,8 +1,8 @@
 const {ccclass, property} = cc._decorator;
 import KBEngine = require("kbengine")
-import SDD = require("single_data");
-import ITEMD = require("item_data");
-import RIDD = require("random_index_data")
+import {datas as ITEMD} from "../CONST/item_data"
+import {datas as SDD} from "../CONST/single_data";
+import {datas as RIDD} from "../CONST/random_index_data";
 
 //var seedrandom = require('seedrandom');
 //import {KBEngine} from "kbengine"
@@ -36,6 +36,18 @@ export class NewClass extends cc.Component {
     @property(cc.Camera)
     private cameraDown: cc.Camera = null;
 
+    @property(cc.Sprite)
+    protected smallWorld: cc.Sprite = null;
+
+    @property(cc.Mask)
+    protected smallMask: cc.Mask = null;
+
+    @property(cc.Prefab)
+    protected backPrefab: cc.Prefab = null;
+
+    @property(cc.Node)
+    protected back: cc.Node = null;
+
     protected flatStart = 0;
     protected flats = null;
     protected flatY = -179
@@ -51,11 +63,19 @@ export class NewClass extends cc.Component {
 
     protected onLoad(){
         //console.log('ckz coop load', seedrandom.random(500));
+        this.initBack();
         this.installEvents();
         this.initEntities();
         this.initFlat();
         this.initDisplay();
         
+    }
+    protected initBack() {
+        this.back = cc.instantiate(this.backPrefab);
+        this.back.scaleX = 40 * 0.125;
+        this.back.scaleY = 0.5 * 0.125;
+        this.smallMask.node.insertChild(this.back, 0);
+        this.back.setPosition(cc.v2());
     }
     protected initDisplay() {
         this.high = 0;
@@ -95,7 +115,7 @@ export class NewClass extends cc.Component {
         e['act'] = aAct;
         let cameraCtl = this.cameraUp.addComponent('JumpCamera');
         cameraCtl.setTarget(e);
-        cameraCtl.init(true);
+        cameraCtl.init(true, this.smallWorld, this.smallMask);
     }
     protected createPlayer(avatar) {
         if (this.player){
@@ -116,7 +136,7 @@ export class NewClass extends cc.Component {
         this.player['act'] = aAct;
         let cameraCtl = this.cameraDown.addComponent('JumpCamera');
         cameraCtl.setTarget(this.player);
-        cameraCtl.init(false)
+        cameraCtl.init(false, this.smallWorld, this.smallMask)
     }
 
     protected installEvents(){
