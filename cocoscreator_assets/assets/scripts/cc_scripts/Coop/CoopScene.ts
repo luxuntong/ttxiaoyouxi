@@ -43,9 +43,6 @@ export class NewClass extends cc.Component {
     @property(cc.Prefab)
     protected backPrefab: cc.Prefab = null;
 
-    @property(cc.Node)
-    protected back: cc.Node = null;
-
     private player:AvatarAct = null;
     protected flatStart = 0;
     protected flats = null;
@@ -58,6 +55,8 @@ export class NewClass extends cc.Component {
     protected high: number = 0;
     protected entities: Array<cc.Node> = null;
     protected randomIndex = 0;
+    protected backPool: Array<any> = null;
+    protected backWidth: number = null;
 
     protected onLoad(){
         //console.log('ckz coop load', seedrandom.random(500));
@@ -69,11 +68,54 @@ export class NewClass extends cc.Component {
         
     }
     protected initBack() {
-        this.back = cc.instantiate(this.backPrefab);
-        this.back.scaleX = 40 * 0.125;
-        this.back.scaleY = 0.5 * 0.125;
-        this.smallMask.node.insertChild(this.back, 0);
-        this.back.setPosition(cc.v2());
+        this.backPool = new Array();
+        for (let i:number = 0; i < 6; i++) {
+            let back = cc.instantiate(this.backPrefab);
+            back.scaleX = 40;
+            back.scaleY = 0.6;
+            this.backWidth = back.width * back.scaleX;
+            this.node.insertChild(back, 0);
+            back.setPosition(cc.v2(i * this.backWidth, 0));
+            this.backPool.push({
+                index: i,
+                back: back
+            })
+        }
+    }
+    public getInWhichBack(x) {
+        for (let backObj of this.backPool) {
+            let half = this.backWidth;
+            if (backObj.back.x - half <= x && backObj.back.x + half >= x)
+            {
+                return backObj.index;
+            }
+        }
+        return -1;
+    }
+
+    protected isBackNotUse(backObj) {
+        for (let entity of this.entities) {
+            let eWidth = entity.width * entity.scaleX;
+            if (Math.abs(backObj.back.x - entity.x) < this.backWidth) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public setBackByIndex(index) {
+        let noUseObj = null;
+        for (let backObj of this.backPool) {
+            if (backObj.index == index) {
+                return;
+            }
+
+            if (this.isBackNotUse(backObj)) {
+                noUseObj = backObj;
+            }
+        }
+        noUseObj.index = index;
+        noUseObj.back.x = index * this.backWidth;        
     }
     protected initDisplay() {
         this.high = 0;
@@ -120,10 +162,15 @@ export class NewClass extends cc.Component {
         aAct.setEid(entity.id);
         aAct.setIsPlayer(isPlayer);
         aAct.init();
+        let cameraCtl;
         if (isPlayer) {
             this.player = aAct;
+            cameraCtl = this.cameraDown.addComponent('JumpCamera');
         }
-        let cameraCtl = this.cameraUp.addComponent('JumpCamera');
+        else {
+            cameraCtl = this.cameraUp.addComponent("JumpCamera");
+        }
+        
         cameraCtl.setTarget(e);
         cameraCtl.init(isPlayer, this.smallWorld, this.smallMask);
     }

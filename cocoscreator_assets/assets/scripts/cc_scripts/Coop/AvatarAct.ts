@@ -39,6 +39,7 @@ export class NewClass extends cc.Component {
     protected actionList: Array<any> = null;
     protected wiatJumpFlag = false;
     protected pressTime: number = 0;
+    protected curBackIndex: number = 0;
 
     protected onKeyDown(event) {
         console.log("key:", event);
@@ -124,6 +125,10 @@ export class NewClass extends cc.Component {
 
         if (ret){
             this.wiatJumpFlag = false;
+        }
+        else {
+            this.wiatJumpFlag = false;
+            this.completed(false);
         }
     }
 
@@ -232,6 +237,12 @@ export class NewClass extends cc.Component {
         this.stateControl.reset();
     }
     protected update (dt){
+        let backIndex = this.world.getInWhichBack(this.node.x);
+        if (backIndex != this.curBackIndex) {
+            this.curBackIndex = backIndex;
+            this.world.setBackByIndex(backIndex + 1);
+        }
+
         if (this.stateControl.getState(AVATAR_STATE.fly)){
             var tCost = (new Date()).valueOf() - this.releaseTime;
             var y = this.yA + this.yB * tCost + this.yC * tCost * tCost;

@@ -11,7 +11,7 @@ export class JumpCamera extends cc.Component {
     protected origin = null;
     onLoad(){
     }
-    protected init(isplayer, smallWindow, smallMask: cc.Mask){
+    protected init(isplayer, smallWindow: cc.Sprite, smallMask: cc.Mask){
         this.isplayer = isplayer;
         this.vsSize = cc.view.getVisibleSize();
         this.origin = cc.view.getVisibleOrigin()
@@ -26,7 +26,7 @@ export class JumpCamera extends cc.Component {
             spriteFrame.setTexture(texture)
 
             smallWindow.spriteFrame = spriteFrame;
-            smallWindow.node.rotation = 180;
+            smallWindow.node.scaleY *= -1;
             let camera:cc.Camera = this.node.getComponent(cc.Camera);
             console.log('ckz camera:', smallWindow, texture);
             camera.targetTexture = texture;
