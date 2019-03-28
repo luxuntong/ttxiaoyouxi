@@ -10,6 +10,7 @@ const datas = {
     speed_base: 1200.0,
     flat_start: -480.0,
     random_range: 10.0,
-    item_create_prob: 0.4
+    item_create_prob: 0.4,
+    small_map_scale: 0.125
 };
 export {datas};

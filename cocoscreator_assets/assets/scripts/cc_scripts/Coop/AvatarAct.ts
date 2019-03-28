@@ -3,6 +3,8 @@ var KBEngine = require("kbengine");
 import {datas as AVATAR_STATE} from "../CONST/conflict_data_state";
 import {datas as ITEMD} from "../CONST/item_data"
 import {datas as SDD} from "../CONST/single_data";
+import {NewClass as CoopScene} from "./CoopScene"
+import {AvatarState} from "../Jump/AvatarState"
 
 const ActionType = {
     jump: 0
@@ -14,17 +16,17 @@ export class NewClass extends cc.Component {
     private pickTouchRange: cc.Node = null;
 
     @property(cc.Node)
-    private stateControl: cc.Node = null;
+    private stateControl: AvatarState = null;
 
     @property(cc.Node)
-    protected world: cc.Node = null;
+    protected world: CoopScene = null;
 
     protected startPos: cc.Vec2 = null;
 
     protected trueWidth = 0;
     protected trueHeight = 0;
     protected isPlayer:boolean = false;
-    protected eid: number = 0;
+    public eid: number = 0;
     protected pressCost: number = 0;
     protected yA: number = 0;
     protected yB: number = 0;
@@ -32,10 +34,11 @@ export class NewClass extends cc.Component {
     protected xA: number = 0;
     protected xB: number = 0;
     protected finalPos: cc.Vec2 = null;
-    protected curIndex: number = 0;
+    public curIndex: number = 0;
     protected releaseTime = 0;
     protected actionList: Array<any> = null;
     protected wiatJumpFlag = false;
+    protected pressTime: number = 0;
 
     protected onKeyDown(event) {
         console.log("key:", event);

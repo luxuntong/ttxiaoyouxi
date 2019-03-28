@@ -3,6 +3,7 @@ import KBEngine = require("kbengine")
 import {datas as ITEMD} from "../CONST/item_data"
 import {datas as SDD} from "../CONST/single_data";
 import {datas as RIDD} from "../CONST/random_index_data";
+import {NewClass as AvatarAct} from "./AvatarAct"
 
 //var seedrandom = require('seedrandom');
 //import {KBEngine} from "kbengine"
@@ -11,9 +12,6 @@ import {datas as RIDD} from "../CONST/random_index_data";
 export class NewClass extends cc.Component {
     @property(cc.Prefab)
     private playerPrefab: cc.Prefab = null;
-
-    @property(cc.Node)
-    private player: cc.Node = null;
 
     @property(cc.Node)
     private pickTouchRange: cc.Node = null;
@@ -48,12 +46,12 @@ export class NewClass extends cc.Component {
     @property(cc.Node)
     protected back: cc.Node = null;
 
+    private player:AvatarAct = null;
     protected flatStart = 0;
     protected flats = null;
     protected flatY = -179
     protected flatIndex = 0;
     protected seed: number = -1;
-    protected playerJump = null;
     protected actionList: Array<any> = null;
     // 玩家当前位置
     protected curIndex: number = -1;
@@ -102,41 +100,32 @@ export class NewClass extends cc.Component {
 
     }
     protected createEntity(entity) {
-        let e = cc.instantiate(this.playerPrefab);
-        this.entities.push(e);
-        this.node.addChild(e);
-        let aState = e.addComponent("AvatarState");
-        let aAct = e.addComponent("AvatarAct");
-        aAct.setNode(this, null, aState);
-        aAct.setStartPos(cc.v2(entity.position.x, this.getAvatarY()));
-        aAct.setIsPlayer(false);
-        aAct.setEid(entity.id);
-        aAct.init();
-        e['act'] = aAct;
-        let cameraCtl = this.cameraUp.addComponent('JumpCamera');
-        cameraCtl.setTarget(e);
-        cameraCtl.init(true, this.smallWorld, this.smallMask);
+        this._createEntity(entity, null, false);
     }
     protected createPlayer(avatar) {
         if (this.player){
             return;
         }
+        this._createEntity(avatar, this.pickTouchRange, true);
+    }
 
-        this.player = cc.instantiate(this.playerPrefab);
-        this.entities.push(this.player);
-        let aState = this.player.addComponent("AvatarState");
-        let aAct = this.player.addComponent("AvatarAct");
-        this.playerJump = aAct;
-        this.node.addChild(this.player);
-        aAct.setNode(this, this.pickTouchRange, aState);
-        aAct.setStartPos(cc.v2(avatar.position.x, this.getAvatarY()));
-        aAct.setIsPlayer(true);
-        aAct.setEid(avatar.id);
+    protected _createEntity(entity, pickTouchRange, isPlayer) {
+        let e = cc.instantiate(this.playerPrefab);
+        this.entities.push(e);
+        this.node.addChild(e);
+        let aState = e.addComponent("AvatarState");
+        let aAct: AvatarAct = e.addComponent("AvatarAct");
+        aAct.setStartPos(cc.v2(entity.position.x, this.getAvatarY()));
+        aAct.setNode(this, pickTouchRange, aState);
+        aAct.setEid(entity.id);
+        aAct.setIsPlayer(isPlayer);
         aAct.init();
-        this.player['act'] = aAct;
-        let cameraCtl = this.cameraDown.addComponent('JumpCamera');
-        cameraCtl.setTarget(this.player);
-        cameraCtl.init(false, this.smallWorld, this.smallMask)
+        if (isPlayer) {
+            this.player = aAct;
+        }
+        let cameraCtl = this.cameraUp.addComponent('JumpCamera');
+        cameraCtl.setTarget(e);
+        cameraCtl.init(isPlayer, this.smallWorld, this.smallMask);
     }
 
     protected installEvents(){
@@ -325,7 +314,7 @@ export class NewClass extends cc.Component {
     }
     public onCompleted(isWin) {
         if (!isWin){
-            this.playerJump.reset();
+            this.player.reset();
             this.resetEntities();
             this.reset();
         }
@@ -356,7 +345,8 @@ export class NewClass extends cc.Component {
     }
     protected isFlatInUse(fIndex){
         for (let e of this.entities) {
-            if (fIndex >= e.act.curIndex - 2 && fIndex <= e.act.curIndex + 10)
+            let act = e.getComponent(AvatarAct);
+            if (fIndex >= act.curIndex - 2 && fIndex <= act.curIndex + 10)
             {
                 return true;
             }
@@ -385,7 +375,7 @@ export class NewClass extends cc.Component {
 
     protected fullOfFlat() {
         for (let e of this.entities) {
-            let start = e.act.curIndex;
+            let start = e.getComponent(AvatarAct).curIndex;
             for (let i = start; i <= start + 10; i++){
                 if (!(i in this.flats)) {
                     this.flats[i] = this.createFlatFromIndex(i);
@@ -395,9 +385,9 @@ export class NewClass extends cc.Component {
     }
 
     public onPlayerLanded (eid) {
-        if (eid == this.player.act.eid)
+        if (eid == this.player.eid)
         {
-            let index = this.player.act.curIndex;
+            let index = this.player.curIndex;
             this.curScoreDisplay.string = 'cur:' + index;
             if (index > this.high) {
                 this.high = index;

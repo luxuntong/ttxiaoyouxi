@@ -1,44 +1,37 @@
 const {ccclass, property} = cc._decorator;
+import {datas as SDD} from "../CONST/single_data"
 
 @ccclass
 export class JumpCamera extends cc.Component {
     @property(cc.Node)
     protected target: cc.Node = null;
     protected mode: number = 0;
-    protected isUp: number = 0;
+    protected isplayer:boolean = false;
     protected vsSize = null;
     protected origin = null;
     onLoad(){
     }
-    protected init(isUp, smallWindow, smallMask: cc.Mask){
-        this.isUp = isUp;
+    protected init(isplayer, smallWindow, smallMask: cc.Mask){
+        this.isplayer = isplayer;
         this.vsSize = cc.view.getVisibleSize();
         this.origin = cc.view.getVisibleOrigin()
-        if (this.mode == 1){
-            if (this.isUp){
-                this.node.y = 0;
-            }
-            else {
-                this.node.y = this.vsSize.height;
-            }
-        }
-        else {
-            this.node.y = this.vsSize.height / 2;
-        }
-        if (isUp) {
+        this.node.y = this.vsSize.height / 2;
+
+        if (!isplayer) {
             
             let texture = new cc.RenderTexture();
             texture.initWithSize(this.vsSize.width, this.vsSize.height);
 
             let spriteFrame = new cc.SpriteFrame();
             spriteFrame.setTexture(texture)
+
             smallWindow.spriteFrame = spriteFrame;
             smallWindow.node.rotation = 180;
             let camera:cc.Camera = this.node.getComponent(cc.Camera);
             console.log('ckz camera:', smallWindow, texture);
             camera.targetTexture = texture;
-            smallMask.node.width = this.vsSize.width * 0.125;
-            smallMask.node.height = this.vsSize.height * 0.125;
+            smallMask.node.width = this.vsSize.width * SDD.small_map_scale;
+            smallMask.node.height = this.vsSize.height * SDD.small_map_scale;
         }
         console.log('camera', this.node);
     }

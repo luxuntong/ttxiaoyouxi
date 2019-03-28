@@ -33,7 +33,7 @@ export class AvatarState extends cc.Component {
         }
         return true;
     }
-    protected setState(statePos){
+    public setState(statePos){
         if (!this.checkSetState(statePos)){
             return false;
         }
@@ -60,10 +60,10 @@ export class AvatarState extends cc.Component {
     protected bitReset(statePos){
         this.state &= ~(1 << statePos);
     }
-    protected getState(statePos){
+    public getState(statePos){
         return this.state & (1 << statePos);
     }
-    protected reset(){
+    public reset(){
         this.state = 1;
     }
     protected printState(){
