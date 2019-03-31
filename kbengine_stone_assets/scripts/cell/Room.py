@@ -135,7 +135,7 @@ class Room(KBEngine.Entity):
         scaleX = 1 + SDD.flat_random_width * self._randomFromIndex(index, RIDD.flat_scalex)
         if index in self.flatInfo:
             feVal = self.flatInfo[index]
-            if feVal.effType == IDD.flat_narrow:
+            if feVal['effType'] == IDD.flat_narrow:
                 return 200 / 2 * scaleX
 
         return 200 * scaleX
@@ -205,5 +205,7 @@ class Room(KBEngine.Entity):
             ERROR_MSG('ckz this flat has effect')
             return -1
 
-        self.flatInfo[effectIndex] = FlatEffect(IDD.flat_narrow)
+        self.flatInfo[effectIndex] = {
+            'effType': IDD.flat_narrow
+        }
         return effectIndex

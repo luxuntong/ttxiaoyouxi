@@ -40,5 +40,7 @@ window.IS_USE_WSS = false;              //是否用wss协议
 window.SERVER_URL = "xxx.com";          //服务器域名
 window.SERVER_IP = "192.168.146.1";
 window.SERVER_PORT = "20013";
+//window.SERVER_IP = "106.14.182.206";
+//window.SERVER_PORT = "30013";
 
 window.SHARE_PICTURE= "https://lg-08x91vr4-1252948162.cos.ap-shanghai.myqcloud.com/stone_share.png";

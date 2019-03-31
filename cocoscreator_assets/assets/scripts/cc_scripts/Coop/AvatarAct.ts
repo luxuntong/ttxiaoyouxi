@@ -44,6 +44,11 @@ export class NewClass extends cc.Component {
     protected HP = SDD.hp_max;
     protected hpNode:cc.Node = null;
 
+
+    onDestroy() {
+        console.log("ckz avatar destroy");
+        this.unInstallEvents();
+    }
     protected onKeyDown(event) {
         console.log("key:", event);
         switch(event.keyCode) {
@@ -127,10 +132,6 @@ export class NewClass extends cc.Component {
     protected initItems() {
     }
 
-    onDestroy(){
-
-    }
-
     protected initSize (){
         this.node.scaleX = SDD.avatar_scale_x;
         this.node.scaleY = SDD.avatar_scale_y;
@@ -147,6 +148,16 @@ export class NewClass extends cc.Component {
         }
         else {
 		    KBEngine.Event.register("otherAvatarOnJump", this, "otherAvatarOnJump");
+        }
+    }
+
+    protected unInstallEvents() {
+        if (this.isPlayer) {
+            KBEngine.Event.deregister("onJumpResult", this, "onJumpResult");
+            KBEngine.Event.deregister("onJumpReset", this, "onJumpReset");
+        }
+        else {
+		    KBEngine.Event.deregister("otherAvatarOnJump", this, "otherAvatarOnJump");
         }
     }
 

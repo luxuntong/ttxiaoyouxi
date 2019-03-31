@@ -11,7 +11,7 @@ export class HallScene extends cc.Component {
     protected label_hint: cc.Label = null;
 
     onLoad () {
-        this.btn_single.node.on('click', this.startSingle, this);
+        this.btn_single.node.active = false;
         this.btn_coop.node.on('click', this.startCoop, this)
         this.installEvents();
     }
