@@ -6,9 +6,11 @@ import GameConfigs
 import random
 import math
 import copy
+
 from interfaces.EntityCommon import EntityCommon
 
 import single_data as SDD
+import item_data as IDD
 
 
 class Avatar(KBEngine.Entity, EntityCommon):
@@ -17,7 +19,8 @@ class Avatar(KBEngine.Entity, EntityCommon):
         EntityCommon.__init__(self)
         self.startPosition = copy.deepcopy(self.position)
         self.getCurrRoom().onEnter(self)
-        self.reset()
+        self.reset(False)
+        self.items = {}
         DEBUG_MSG("new avatar cell: id=%i accountName=%s  avatarName=%s spaceID=%i" % (self.id, self.accountName, self.avatarName, self.spaceID))
 
     def isAvatar(self):
@@ -76,33 +79,47 @@ class Avatar(KBEngine.Entity, EntityCommon):
             return
 
         self.otherClients.onJump(pressCount, finalPos, curIndex)
-        self.curPos = finalPos
-        self.curIndex = curIndex
-        self.client.onJumpResult(True)
         if curIndex == -1:
-            self._notifyRoomReset()
+            self._modifyHp(-1)
+            if self.HP == 0:
+                self.getCurrRoom().onAvatarDied(self.id)
+                return
+
+            self.curIndex += 1
+            x = self.getCurrRoom().getRelivePos(self.curIndex)
+            self.curPos = (x, self.position[2])
+            self.allClients.onGetRelivePos(self.id, self.curPos)
+        else:
+            self.curPos = finalPos
+            self.curIndex = curIndex
+            self.client.onJumpResult(True)
 
     def _jumpCheck(self, pressCount, finalPos, curIndex):
         finalX = self._calcJump(pressCount)
         if abs(finalX - finalPos[0]) > 0.01:
+            ERROR_MSG('jump pos wrong:', finalX, finalPos)
             return False
 
         curRoom = self.getCurrRoom()
         if not curRoom:
+            ERROR_MSG('get room failed')
             return False
 
         retIndex = curRoom.getFlatIndexByPos(finalPos[0], self.curIndex)
         if retIndex != curIndex:
+            ERROR_MSG('index invalid:', retIndex, curIndex)
             return False
 
         return True
 
     def _notifyRoomReset(self):
-        self.getCurrRoom().onNotifyReset()
+        self.getCurrRoom().onNotifyReset(False)
 
-    def reset(self):
+    def reset(self, isNotify):
         self.curPos = (self.position[0], self.position[2])
         self.curIndex = 0
+        if isNotify:
+            self.client.onReset()
 
     def _calcJump(self, pressCount):
         angle = 40 * math.pi / 180
@@ -117,7 +134,19 @@ class Avatar(KBEngine.Entity, EntityCommon):
         return finalX
 
     def leaveRoom(self, exposed):
-        pass
+        self.destroy()
+
+    def _getNewItem(self):
+        for index in range(int(SDD.my_item_max)):
+            if index in self.items:
+                continue
+
+            self.items[index] = {
+                'itemType': IDD.flat_narrow
+            }
+            return index
+
+        return -1
 
     def getItem(self, exposed, index):
         DEBUG_MSG('get item:', exposed, index)
@@ -129,4 +158,44 @@ class Avatar(KBEngine.Entity, EntityCommon):
         if not curRoom:
             ERROR_MSG('get item cur room failed!')
             return
+
+        if not curRoom.isHasItem(index):
+            ERROR_MSG('get item invalid index;', index)
+            curRoom.onNotifyReset(True)
+            return
+
+        self.allClients.onGetItem(self.id, index, self._getNewItem())
+
+    def useItem(self, exposed, index, eid):
+        DEBUG_MSG('ckz use item:', index)
+        if exposed != self.id:
+            ERROR_MSG('getItem exposed invalid:', exposed)
+            return
+
+        if index not in self.items:
+            ERROR_MSG('error item index')
+            return
+
+        flatIndex = self.getCurrRoom().onAvatarUseItem(eid)
+        if flatIndex != -1:
+            iVal = self.items.pop(index)
+            self.allClients.onUseItemRet(self.id, index, iVal['itemType'], flatIndex)
+
+    def _modifyHp(self, delta):
+        newHP = self.HP + delta
+        if newHP > SDD.hp_max:
+            newHP = SDD.hp_max
+
+        if newHP < 0:
+            newHP = 0
+
+        self.HP = newHP
+
+    def onCmpleted(self, eid):
+        self.base.onLeaveRoom()
+        self.client.onJumpCompleted(eid)
+
+    def getMyFlatIndex(self):
+        return self.curIndex
+
 

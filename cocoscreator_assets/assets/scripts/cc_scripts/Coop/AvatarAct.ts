@@ -40,6 +40,9 @@ export class NewClass extends cc.Component {
     protected wiatJumpFlag = false;
     protected pressTime: number = 0;
     protected curBackIndex: number = 0;
+    protected relivePos = null;
+    protected HP = SDD.hp_max;
+    protected hpNode:cc.Node = null;
 
     protected onKeyDown(event) {
         console.log("key:", event);
@@ -64,19 +67,32 @@ export class NewClass extends cc.Component {
 
     // onLoad () {},
     protected onCollisionEnter(other, self){
+        console.log('get item:', other, self)
         if (other.name.startsWith("debuff")){
-            other.node.fatherObj.item = null;
-            other.node.destroy();
-            this.getItem();
-            return;
+            let player = KBEngine.app.player();
+            if(player != undefined && player.inWorld && player.id == this.eid) {
+                player.getItem(other.node.fatherObj.index);
+            }
         }
     }
-    protected getItem(){
+
+    public isMe(eid) {
+        return eid == this.eid;
+    }
+    protected onJumpReset(eid) {
+        console.log('on reset ', eid);
+        if (eid != this.eid) {
+            return;
+        }
+        this.completed(false);
+    }
+    protected onGetItem(eid, flatIndex) {
+        console.log('on get item:', eid, flatIndex);
         var itemType = 0;
         console.log(itemType, ITEMD.flat_narrow);
         if (itemType == ITEMD.flat_narrow){
-            this.world.pushAction(itemType);
         }
+        //this.world.onGetItem(flatIndex);
     }
     public setNode(world, pickTouchRange, stateCtl){
         this.world = world;
@@ -91,7 +107,24 @@ export class NewClass extends cc.Component {
         this.actionList = new Array();
         this.initSize();
         this.installEvents();
+        this.initItems();
+        this.initHP();
         this.reset();
+    }
+
+    protected initHP() {
+        this.hpNode = new cc.Node();
+        let label = this.hpNode.addComponent(cc.Label);
+        this.HP = SDD.hp_max;
+        label.string = "HP:" + this.HP;
+        label.fontSize = 80;
+        label.lineHeight = 100;
+        this.node.addChild(this.hpNode);
+        this.hpNode.y = 200;
+        this.hpNode.height = 100;
+    }
+
+    protected initItems() {
     }
 
     onDestroy(){
@@ -110,6 +143,7 @@ export class NewClass extends cc.Component {
             this.pickTouchRange.on(cc.Node.EventType.TOUCH_START, this.onMouseDown, this);
             this.pickTouchRange.on(cc.Node.EventType.TOUCH_END, this.onMouseUp, this);
             KBEngine.Event.register("onJumpResult", this, "onJumpResult");
+            KBEngine.Event.register("onJumpReset", this, "onJumpReset");
         }
         else {
 		    KBEngine.Event.register("otherAvatarOnJump", this, "otherAvatarOnJump");
@@ -148,6 +182,45 @@ export class NewClass extends cc.Component {
         if (this.stateControl.getState(AVATAR_STATE.idle)) {
             this.doAction();
         }
+    }
+
+    public onGetRelivePos(eid, relivePos) {
+        if (this.eid != eid) {
+            KBEngine.ERROR_MSG("eid is wrong");
+            return;
+        }
+
+        this.relivePos = relivePos;
+        this.relive();
+    }
+
+    public onCompleted() {
+        this.stateControl.setState(AVATAR_STATE.finish);
+    }
+
+    public onModifyHp(eid, hp) {
+        if (this.eid != eid) {
+            KBEngine.ERROR_MSG("eid is wrong");
+            return;
+        }
+        this.HP = hp;
+        this.hpNode.getComponent(cc.Label).string = "HP:" + hp;
+    }
+
+    protected relive() {
+        if (this.relivePos == null) {
+            return;
+        }
+
+        if (!this.stateControl.getState(AVATAR_STATE.waitResult)){
+            return;
+        }
+
+        this.node.x = this.relivePos[0];
+        this.node.y = this.startPos.y + this.trueHeight / 2;
+        this.relivePos = null;
+        this.stateControl.setState(AVATAR_STATE.idle);
+        this.wiatJumpFlag = false;
     }
 
     protected doAction() {
@@ -235,6 +308,7 @@ export class NewClass extends cc.Component {
         this.curIndex = 0;
         console.log('ckz: player now:', this.startPos, this.trueHeight, this.node);
         this.stateControl.reset();
+        this.initItems();
     }
     protected update (dt){
         let backIndex = this.world.getInWhichBack(this.node.x);
@@ -244,6 +318,9 @@ export class NewClass extends cc.Component {
         }
 
         if (this.stateControl.getState(AVATAR_STATE.fly)){
+            if (this.node.y < -200) {
+                return;
+            }
             var tCost = (new Date()).valueOf() - this.releaseTime;
             var y = this.yA + this.yB * tCost + this.yC * tCost * tCost;
             var x = this.xA + tCost * this.xB;
@@ -259,10 +336,11 @@ export class NewClass extends cc.Component {
                 this.node.y = y;
                 this.node.x = x;
             }
-        }
 
-        if (this.node.y < -200){
-            this.completed(false);
+            if (this.node.y < -200){
+                this.stateControl.setState(AVATAR_STATE.waitResult);
+                this.relive();
+            }
         }
     }
     // update (dt) {},

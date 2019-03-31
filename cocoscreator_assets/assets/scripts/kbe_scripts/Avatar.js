@@ -73,9 +73,30 @@ KBEngine.Avatar = KBEngine.Entity.extend({
             cc.log("avatar %d cell jump", this.id);
 		    this.cellCall("jump", pressCount, finalPos, curIndex);
         },
+        getItem: function(flatIndex) {
+		    this.cellCall("getItem", flatIndex);
+        },
         onJumpResult: function(ret)
         {
 		    KBEngine.Event.fire("onJumpResult", this.id, ret);
+        },
+        leaveRoom: function() {
+		    this.cellCall("leaveRoom");
+        },
+        useItem: function(itemIndex, eid) {
+            this.cellCall("useItem", itemIndex, eid);
+        },
+        onUseItemRet: function(eid, itemIndex, itemType, flatIndex){
+		    KBEngine.Event.fire("onUseItemRet", eid, itemIndex, itemType, flatIndex);
+        },
+        onGetItem: function(eid, flatIndex, itemIndex){
+		    KBEngine.Event.fire("onGetItem", eid, flatIndex, itemIndex);
+        },
+        onGetRelivePos: function(eid, relivePos) {
+		    KBEngine.Event.fire("onGetRelivePos", eid, relivePos);
+        },
+        onReset: function(){
+		    KBEngine.Event.fire("onJumpReset", this.id);
         },
         onJump : function(pressCount, finalPos, curIndex)
 	    {
@@ -180,12 +201,19 @@ KBEngine.Avatar = KBEngine.Entity.extend({
             KBEngine.INFO_MSG("Game is over: avatar " + this.id + "win= " + isWin.toString());
             KBEngine.Event.fire("onGameOver", this.id, isWin, hitRate, totalTime, totalHarm, score);
         },
+        onJumpCompleted: function(eid) {
+            KBEngine.Event.fire("onJumpCompleted", eid);
+        },
 
         //石头出界，重置石头
         resetItem: function(itemID)
         {
             KBEngine.INFO_MSG("reset item ......");
             this.cellCall("resetItem", itemID);
+        },
+        set_HP: function(oldHp) {
+            console.log('ckz set hp', oldHp);
+            KBEngine.Event.fire("onModifyHp", this.id, this.HP);
         },
 
         onResetItem: function(itemID, position)

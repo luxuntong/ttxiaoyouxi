@@ -76,7 +76,55 @@
             <Type>          PYTHON              </Type>
             <Flags>         CELL_PUBLIC         </Flags>
         </curPos>
+
+        <HP>
+            <Type>          INT8                </Type>
+            <Flags>         ALL_CLIENTS         </Flags>
+        </HP>
+
+        <items>
+            <Type>          PYTHON              </Type>
+            <Flags>         CELL_PRIVATE        </Flags>
+        </items>
     </Properties>
+
+    <BaseMethods>
+        <createCell>
+            <Arg>    ENTITYCALL </Arg>
+        </createCell>
+
+        <matchCoop> <Exposed/>
+        </matchCoop>
+
+        <decodeEncryptedData>
+            <Exposed/>
+            <Arg>    UNICODE     </Arg>
+            <Arg>    UNICODE     </Arg>
+        </decodeEncryptedData>
+
+        <onLeaveRoom>
+        </onLeaveRoom>
+    </BaseMethods>
+
+    <CellMethods>
+        <jump> <Exposed/>
+            <Arg>   FLAT_INDEX                  </Arg>
+            <Arg>   ARRAY <of>   FLOAT   </of>         </Arg>
+            <Arg>   INT32                   </Arg>
+        </jump>
+
+        <leaveRoom> <Exposed/>
+        </leaveRoom>
+
+        <getItem> <Exposed/>
+            <Arg>   FLAT_INDEX                  </Arg>
+        </getItem>
+
+        <useItem> <Exposed/>
+            <Arg>   UINT8                       </Arg>
+            <Arg>   ENTITY_ID                    </Arg>
+        </useItem>
+    </CellMethods>
 
     <ClientMethods>
         <onDie>
@@ -148,29 +196,31 @@
         <onJumpResult>
             <Arg>   BOOL            </Arg>
         </onJumpResult>
-    </ClientMethods>
 
-    <BaseMethods>
-        <createCell>
-            <Arg>    ENTITYCALL </Arg>
-        </createCell>
+        <onGetItem>
+            <Arg>   ENTITY_ID       </Arg>
+            <Arg>   FLAT_INDEX      </Arg>
+            <Arg>   INT8            </Arg>
+        </onGetItem>
 
-        <matchCoop> <Exposed/>
-        </matchCoop>
+        <onReset>
+        </onReset>
 
-        <decodeEncryptedData>
-            <Exposed/>
-            <Arg>    UNICODE     </Arg>
-            <Arg>    UNICODE     </Arg>
-        </decodeEncryptedData>
-    </BaseMethods>
-
-    <CellMethods>
-        <jump> <Exposed/>
-            <Arg>   UINT16                  </Arg>
+        <onGetRelivePos>
+            <Arg>   ENTITY_ID       </Arg>
             <Arg>   ARRAY <of>   FLOAT   </of>         </Arg>
-            <Arg>   INT32                   </Arg>
-        </jump>
-    </CellMethods>
+        </onGetRelivePos>
+
+        <onJumpCompleted>
+            <Arg>   ENTITY_ID       </Arg>
+        </onJumpCompleted>
+
+        <onUseItemRet>
+            <Arg>   ENTITY_ID       </Arg>
+            <Arg>   UINT8           </Arg>
+            <Arg>   UINT8           </Arg>
+            <Arg>   FLAT_INDEX      </Arg>
+        </onUseItemRet>
+    </ClientMethods>
 
 </root>

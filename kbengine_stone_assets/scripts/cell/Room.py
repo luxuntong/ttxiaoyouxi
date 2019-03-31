@@ -5,6 +5,7 @@ import GameConfigs
 import random
 import single_data as SDD
 import random_index_data as RIDD
+import item_data as IDD
 import GameUtils
 
 TIMER_TYPE_DESTROY = 1
@@ -14,6 +15,10 @@ TIMER_TYPE_NEXT_PLAYER = 4
 TIMER_TYPE_GAME_OVER = 5
 TIMER_TYPE_SECOND = 6
 TIMER_TYPE_RESET_ROOM = 7
+
+class FlatEffect(object):
+    def __init__(self, effType):
+        self.effType = effType
 
 
 class Room(KBEngine.Entity):
@@ -29,6 +34,8 @@ class Room(KBEngine.Entity):
         # 这个房间中所有的玩家
         self.tags = {}
         self.entities = {}
+        self.liveAvatars = {}
+        self.flatInfo = {}
 
         DEBUG_MSG('created space[%d] entityID = %i spaceid=%i' % (self.roomKeyC, self.id, self.spaceID))
 
@@ -52,6 +59,7 @@ class Room(KBEngine.Entity):
         className = entityCall.__class__.__name__
         if className == 'Avatar':
             entityCall.onSetRoomSeed(self.roomSeed)
+            self.liveAvatars[entityCall.id] = entityCall.id
 
         self.tags.setdefault(className, [])
         self.tags[className].append(entityCall.id)
@@ -92,6 +100,19 @@ class Room(KBEngine.Entity):
         if len(avatarList) == 0:
             self.destroy()
 
+    def onAvatarDied(self, eid):
+        self.liveAvatars.pop(eid)
+        if len(self.liveAvatars) == 1:
+            for winner in self.liveAvatars:
+                break
+
+            for eid in self.tags['Avatar']:
+                entity = self._getEntityById(eid)
+                if not entity:
+                    continue
+
+                entity.onCmpleted(winner)
+
     def findEntityByID(self, ID):
         return self.entities[ID]
 
@@ -105,10 +126,18 @@ class Room(KBEngine.Entity):
 
     def _getFlatPosX(self, index):
         x = SDD.flat_start + index * SDD.flat_spacing
+        if not index:
+            return x
+
         return self._centerRandom(x, SDD.flat_x_random_range, self._randomFromIndex(index, RIDD.flat_posx))
 
     def _getFlatWidth(self, index):
         scaleX = 1 + SDD.flat_random_width * self._randomFromIndex(index, RIDD.flat_scalex)
+        if index in self.flatInfo:
+            feVal = self.flatInfo[index]
+            if feVal.effType == IDD.flat_narrow:
+                return 200 / 2 * scaleX
+
         return 200 * scaleX
 
     def getFlatIndexByPos(self, x, startIndex):
@@ -119,6 +148,10 @@ class Room(KBEngine.Entity):
         return -1
 
     def isHasItem(self, index):
+        if index in self.itemGetSet:
+            return False
+
+        self.itemGetSet.add(index)
         return self._randomFromIndex(index, RIDD.has_item) < SDD.item_create_prob
 
     def _isInFlat(self, x, index):
@@ -134,11 +167,43 @@ class Room(KBEngine.Entity):
     def _getEntityById(self, id):
         return KBEngine.entities.get(id)
 
-    def onNotifyReset(self):
+    def getRelivePos(self, index):
+        flatPos = self._getFlatPosX(index)
+        return flatPos
+
+    def onNotifyReset(self, isNotify=False):
+        self.itemGetSet = set()
         for eid in self.tags['Avatar']:
             entity = self._getEntityById(eid)
             if not entity:
                 continue
 
-            entity.reset()
+            entity.reset(isNotify)
 
+    def _checkIsAvatarInFlat(self, index):
+        for eid in self.tags['Avatar']:
+            entity = self._getEntityById(eid)
+            flatIndex = entity.getMyFlatIndex()
+            if index == flatIndex:
+                return True
+
+        return False
+
+    def onAvatarUseItem(self, eid):
+        entity = self._getEntityById(eid)
+        if not entity:
+            ERROR_MSG('ckz: _checkUseItem failed:')
+            return -1
+
+        flatIndex = entity.getMyFlatIndex()
+        effectIndex = flatIndex + 1
+        if self._checkIsAvatarInFlat(effectIndex):
+            ERROR_MSG('ckz some one in this flat')
+            return -1
+
+        if effectIndex in self.flatInfo:
+            ERROR_MSG('ckz this flat has effect')
+            return -1
+
+        self.flatInfo[effectIndex] = FlatEffect(IDD.flat_narrow)
+        return effectIndex

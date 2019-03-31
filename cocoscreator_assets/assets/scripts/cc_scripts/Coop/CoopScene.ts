@@ -4,6 +4,7 @@ import {datas as ITEMD} from "../CONST/item_data"
 import {datas as SDD} from "../CONST/single_data";
 import {datas as RIDD} from "../CONST/random_index_data";
 import {NewClass as AvatarAct} from "./AvatarAct"
+import { HallScene } from "../Hall/HallScene";
 
 //var seedrandom = require('seedrandom');
 //import {KBEngine} from "kbengine"
@@ -43,6 +44,12 @@ export class NewClass extends cc.Component {
     @property(cc.Prefab)
     protected backPrefab: cc.Prefab = null;
 
+    @property(cc.Prefab)
+    protected myItemPrefab: cc.Prefab = null;
+
+    @property(cc.Node)
+    protected account: cc.Node = null;
+
     private player:AvatarAct = null;
     protected flatStart = 0;
     protected flats = null;
@@ -53,10 +60,13 @@ export class NewClass extends cc.Component {
     // 玩家当前位置
     protected curIndex: number = -1;
     protected high: number = 0;
-    protected entities: Array<cc.Node> = null;
+    protected entities = {};
     protected randomIndex = 0;
     protected backPool: Array<any> = null;
     protected backWidth: number = null;
+    protected flatInfo = null;
+    protected myItems = null;
+    protected uiRoot: cc.Node = null;
 
     protected onLoad(){
         //console.log('ckz coop load', seedrandom.random(500));
@@ -65,7 +75,17 @@ export class NewClass extends cc.Component {
         this.initEntities();
         this.initFlat();
         this.initDisplay();
-        
+        this.initPhyx();
+        this.init();
+        this.myItems = {};
+        this.uiRoot = cc.find("UIRoot");
+        this.account.active = false;
+    }
+    protected init() {
+    }
+    protected initPhyx() {
+        var manager = cc.director.getCollisionManager();
+        manager.enabled = true;
     }
     protected initBack() {
         this.backPool = new Array();
@@ -94,7 +114,8 @@ export class NewClass extends cc.Component {
     }
 
     protected isBackNotUse(backObj) {
-        for (let entity of this.entities) {
+        for (let eid in this.entities) {
+            let entity = this.entities[eid];
             let eWidth = entity.width * entity.scaleX;
             if (Math.abs(backObj.back.x - entity.x) < this.backWidth) {
                 return false;
@@ -124,7 +145,7 @@ export class NewClass extends cc.Component {
     }
     protected initEntities(){
         let entities = KBEngine.app.entities;
-        this.entities = new Array();
+        this.entities = {};
         for (var eid in entities){
             this.initEntity(entities[eid]);
         }
@@ -153,7 +174,7 @@ export class NewClass extends cc.Component {
 
     protected _createEntity(entity, pickTouchRange, isPlayer) {
         let e = cc.instantiate(this.playerPrefab);
-        this.entities.push(e);
+        this.entities[entity.id] = e;
         this.node.addChild(e);
         let aState = e.addComponent("AvatarState");
         let aAct: AvatarAct = e.addComponent("AvatarAct");
@@ -191,6 +212,12 @@ export class NewClass extends cc.Component {
         KBEngine.Event.register("updatePosition", this, "updatePosition");
        
         KBEngine.Event.register("set_position", this, "set_position");
+        KBEngine.Event.register("onGetItem", this, "onGetItem");
+        KBEngine.Event.register("onGetRelivePos", this, "onGetRelivePos");
+        KBEngine.Event.register("onModifyHp", this, "onModifyHp");
+        KBEngine.Event.register("onJumpCompleted", this, "onJumpCompleted");
+        KBEngine.Event.register("onUseItemRet", this, "onUseItemRet");
+        
     }
 
     protected unInstallEvents() {
@@ -208,6 +235,11 @@ export class NewClass extends cc.Component {
         KBEngine.Event.deregister("updatePosition", this, "updatePosition");
        
         KBEngine.Event.deregister("set_position", this, "set_position");
+        KBEngine.Event.deregister("onGetItem", this, "onGetItem");
+        KBEngine.Event.deregister("onGetRelivePos", this, "onGetRelivePos");
+        KBEngine.Event.deregister("onModifyHp", this, "onModifyHp");
+        KBEngine.Event.deregister("onJumpCompleted", this, "onJumpCompleted");
+        KBEngine.Event.deregister("onUseItemRet", this, "onUseItemRet");
     }
 
     public onDisconnected() {
@@ -259,6 +291,7 @@ export class NewClass extends cc.Component {
         
     }
     protected initFlat() {
+        this.flatInfo = {};
         if (this.seed == -1){
             KBEngine.ERROR_MSG('ckz wrong seed');
             return
@@ -288,15 +321,157 @@ export class NewClass extends cc.Component {
         let newPos = cc.v2(x, this.flatY);
         return this.createFlat(newPos, index);
     }
+    public onGetItem(eid, flatIndex: number, itemIndex) {
+        this.flatInfo[flatIndex] = {'item': false};
+        let flatObj = this.flats[flatIndex];
+        if (flatObj && flatObj.item) {
+            flatObj.item.destroy();
+            flatObj.item = null;
+        }
+
+        if (this.player.isMe(eid)) {
+            this.createMyItem(itemIndex);
+        }
+    }
+
+    protected setFlatInfo(index, key, value) {
+        if (index in this.flatInfo) {
+            this.flatInfo[index][key] = value;
+        }
+        else {
+            this.flatInfo[index] = {
+                key: value
+            }
+        }
+    }
+
+    protected onUseItemRet(eid, itemIndex, itemType, flatIndex) {
+        if (this.player.isMe(eid)) {
+            if (itemIndex in this.myItems && this.myItems[itemIndex].item) {
+                this.myItems[itemIndex].item.destroy();
+                this.myItems[itemIndex].item = null;
+            }
+        }
+
+        if (itemType == ITEMD.flat_narrow) {
+            this.setFlatInfo(flatIndex, 'effect', itemType);
+            if (flatIndex in this.flats) {
+                let flatObj = this.flats[flatIndex];
+                flatObj.flat.scaleX *= 0.5;
+            }
+        }
+    }
+
+    protected onGetRelivePos(eid, relivePos) {
+        let entity = this.entities[eid];
+        let act: AvatarAct = entity.getComponent(AvatarAct);
+        act.onGetRelivePos(eid, relivePos);
+    }
+    protected onJumpCompleted(eid) {
+        this.account.active = true;
+        let returnBtn = cc.find("return", this.account);
+        returnBtn.on(cc.Node.EventType.TOUCH_START, this.onReturnClick, this);
+        for (let eid in this.entities) {
+            let entity = this.entities[eid];
+            let act = entity.getComponent(AvatarAct);
+            act.onCompleted();
+        }
+    }
+
+    protected onReturnClick() {
+        console.log('ckz click');
+        let player = KBEngine.app.player();
+        if(player != undefined && player.inWorld) {
+            player.leaveRoom();
+        }
+        cc.director.loadScene("HallScene", () =>{
+            console.log('load hall finished!');
+        });
+        this.unInstallEvents();
+    }
+
+    protected onModifyHp(eid, hp) {
+        let entity = this.entities[eid];
+        if (!entity) {
+            return;
+        }
+        let act: AvatarAct = entity.getComponent(AvatarAct);
+        act.onModifyHp(eid, hp);
+    }
+
+    protected createMyItem(itemIndex) {
+        if (itemIndex in this.myItems){
+            if (this.myItems[itemIndex].item != null) {
+                KBEngine.ERROR_MSG("get err item index" + itemIndex);
+                return;
+            }
+        } else {
+            this.myItems[itemIndex] = {item: null};
+        }
+        let item = cc.instantiate(this.myItemPrefab);
+        this.myItems[itemIndex].item = item
+        item.scaleX = SDD.item_scale_x;
+        item.scaleY = SDD.item_scale_y;
+        this.uiRoot.addChild(item);
+        item.x = 100 + itemIndex * 100;
+        item.y = 100;
+        console.log('create my item:', item);
+
+        let that = this;
+        item.on(cc.Node.EventType.TOUCH_START, function(){
+            console.log('item click:', itemIndex);
+            that.clickItem(itemIndex);
+        });
+    }
+
+    protected getEnemyEid() {
+        for (let eid in this.entities) {
+            let id = parseInt(eid);
+            if (!this.player.isMe(id)) {
+                return id;
+            }
+        }
+        return -1;
+    }
+
+    protected clickItem(itemIndex) {
+        let player = KBEngine.app.player();
+        if(player != undefined && player.inWorld) {
+            player.useItem(itemIndex, this.getEnemyEid());
+        }
+    }
+
+    protected destroyMyItem() {
+        for (let i = 0; i < 4; i++) {
+            if (i in this.myItems && this.myItems[i].item != null) {
+                this.myItems[i].item.destroy();
+                this.myItems[i].item = null;
+            }
+        }
+    }
+
+    protected getFlatEffect(index) {
+        if (this.randomIndex in this.flatInfo) {
+            let flatInfo = this.flatInfo[this.randomIndex];
+            if ('effect' in flatInfo) {
+                return flatInfo.effect;
+            }
+        }
+        return -1;
+    }
 
     protected createFlat (pos, isHasItem){
         let newFlat = cc.instantiate(this.flatPrefab);
         this.node.addChild(newFlat);
         newFlat.setPosition(pos);
         newFlat.scaleX = 1 + SDD.flat_random_width * this.randomFromIndex(RIDD.flat_scalex);
+        if (this.getFlatEffect(this.randomIndex) == ITEMD.flat_narrow) {
+            newFlat.scaleX *= 0.5;
+        }
         newFlat['flatIndex'] = this.flatIndex++;
         let obj = {
             flat: newFlat,
+            index: this.randomIndex,
             item: null
         }
         if (isHasItem){
@@ -305,7 +480,21 @@ export class NewClass extends cc.Component {
         return obj;    
     }
 
+    protected isIndexNoItem(index) {
+        if (index in this.flatInfo) {
+            let info = this.flatInfo[index];
+            if ('item' in info && info.item == false) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     protected randomItem(pos, flat, fatherObj) {
+        if (this.isIndexNoItem(this.randomIndex)) {
+            console.log('this flat not item:' ,this.randomIndex);
+            return null;
+        }
         let randValue = this.randomFromIndex(RIDD.has_item)
         if (randValue < SDD.item_create_prob){
             let flatWidth = flat.scaleX * flat.width;
@@ -361,13 +550,13 @@ export class NewClass extends cc.Component {
     }
     public onCompleted(isWin) {
         if (!isWin){
-            this.player.reset();
             this.resetEntities();
             this.reset();
         }
     }
     protected resetEntities() {
-        for (let entity of this.entities) {
+        for (let eid in this.entities) {
+            let entity = this.entities[eid];
             let eCtl = entity.getComponent('AvatarAct');
             eCtl.reset();
         }
@@ -376,10 +565,12 @@ export class NewClass extends cc.Component {
         this.destroyAllFlat();
         this.initOnReset();
         this.curScoreDisplay.string = "cur: 0";
+        this.init();
     }
     protected initOnReset() {
         this.initFlat();
         this.initAction();
+        this.destroyMyItem();
     }
     protected initAction() {
         this.actionList = new Array();
@@ -391,8 +582,9 @@ export class NewClass extends cc.Component {
         }
     }
     protected isFlatInUse(fIndex){
-        for (let e of this.entities) {
-            let act = e.getComponent(AvatarAct);
+        for (let eid in this.entities) {
+            let entity = this.entities[eid];
+            let act = entity.getComponent(AvatarAct);
             if (fIndex >= act.curIndex - 2 && fIndex <= act.curIndex + 10)
             {
                 return true;
@@ -421,8 +613,9 @@ export class NewClass extends cc.Component {
     }
 
     protected fullOfFlat() {
-        for (let e of this.entities) {
-            let start = e.getComponent(AvatarAct).curIndex;
+        for (let eid in this.entities) {
+            let entity = this.entities[eid];
+            let start = entity.getComponent(AvatarAct).curIndex;
             for (let i = start; i <= start + 10; i++){
                 if (!(i in this.flats)) {
                     this.flats[i] = this.createFlatFromIndex(i);

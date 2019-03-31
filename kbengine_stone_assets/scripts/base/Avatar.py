@@ -10,6 +10,8 @@ import pyaes
 import random
 #from Crypto.Cipher import AES
 
+import single_data as SDD
+
 TIMER_TYPE_ENTER_ROOM = 1
 
 class Avatar(KBEngine.Proxy):
@@ -21,6 +23,7 @@ class Avatar(KBEngine.Proxy):
         self.cellData["accountName"] = self.__ACCOUNT_NAME__
         self.cellData["position"] = (-475, 0, -69)
         self.cellData["avatarName"] = ""
+        self.cellData['HP'] = int(SDD.hp_max)
 
         datas = self.getClientDatas()
         DEBUG_MSG('ckz: login datas:', datas)
@@ -37,6 +40,10 @@ class Avatar(KBEngine.Proxy):
         self.initNotSaveProp()
         if not self.isInit:
             self.initFirst()
+
+    def initCellDataBeforeEnterRoom(self):
+        self.cellData["position"] = (-475, 0, -69)
+        self.cellData['HP'] = int(SDD.hp_max)
 
     def initFirst(self):
         self.isInit = 1
@@ -121,7 +128,7 @@ class Avatar(KBEngine.Proxy):
         DEBUG_MSG("%s::onLoseCell: %i" % (self.className, self.id))
 
         # 如果self._destroyTimer大于0说明之前已经由base请求销毁，通常是客户端断线了
-        self.destroySelf()
+        # self.destroySelf()
 
         # 否则由cell发起销毁， 那么说明游戏结束了
 
@@ -152,7 +159,12 @@ class Avatar(KBEngine.Proxy):
     def onGetRoom(self, roomUUID, roomBox):
         self.roomUUID = roomUUID
         self.roomBox = roomBox
+        self.initCellDataBeforeEnterRoom()
         roomBox.enterRoom(self, None, None, self.gbID)
+
+    def onLeaveRoom(self):
+        self.roomUUID = 0
+        self.roomBox = None
 
     def onDestroyTimer(self):
         DEBUG_MSG("Avatar::onDestroyTimer: %i" % (self.id))

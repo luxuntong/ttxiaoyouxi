@@ -11,6 +11,8 @@ const datas = {
     flat_start: -480.0,
     random_range: 10.0,
     item_create_prob: 0.4,
-    small_map_scale: 0.125
+    small_map_scale: 0.125,
+    my_item_max: 4.0,
+    hp_max: 3.0
 };
 export {datas};

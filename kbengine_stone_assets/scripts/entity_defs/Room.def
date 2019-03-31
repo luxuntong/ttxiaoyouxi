@@ -21,6 +21,17 @@
             <Default>       set()                   </Default>
             <Flags>         CELL_PUBLIC             </Flags>
         </itemGetSet>
+
+        <liveAvatars>
+            <Type>          PYTHON                  </Type>
+            <Default>       {}                      </Default>
+            <Flags>         CELL_PUBLIC             </Flags>
+        </liveAvatars>
+
+        <flatInfo>
+            <Type>          PYTHON                  </Type>
+            <Flags>         CELL_PRIVATE            </Flags>
+        </flatInfo>
     </Properties>
 
     <ClientMethods>
