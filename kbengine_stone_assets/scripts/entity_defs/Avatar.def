@@ -1,4 +1,9 @@
 <root>
+    <Interfaces>
+        <Interface>     iTimer                  </Interface>
+
+    </Interfaces>
+
     <Properties>
         <sessionKey>
             <Type>        UNICODE        </Type>

@@ -1,0 +1,22 @@
+<root>
+    <Properties>
+        <timerDataCell>
+            <Type>      PYTHON                  </Type>
+            <Default>   {}                      </Default>
+            <Flags>     CELL_PUBLIC             </Flags>
+        </timerDataCell>
+
+        <timerDataBase>
+            <Type>      PYTHON                  </Type>
+            <Default>   {}                      </Default>
+            <Flags>     BASE                    </Flags>
+        </timerDataBase>
+    </Properties>
+
+    <ClientMethods>
+    </ClientMethods>
+
+    <BaseMethods>
+    </BaseMethods>
+
+</root>

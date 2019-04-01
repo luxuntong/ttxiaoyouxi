@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 import KBEngine
 from KBEDebug import *
-import GameUtils
-import GameConfigs
-import random
 import math
 import copy
+import gametimer
+import iTimer
 
 from interfaces.EntityCommon import EntityCommon
 
@@ -13,7 +12,7 @@ import single_data as SDD
 import item_data as IDD
 
 
-class Avatar(KBEngine.Entity, EntityCommon):
+class Avatar(KBEngine.Entity, EntityCommon, iTimer.ITimer):
     def __init__(self):
         KBEngine.Entity.__init__(self)
         EntityCommon.__init__(self)
@@ -32,7 +31,8 @@ class Avatar(KBEngine.Entity, EntityCommon):
     #                              Callbacks
     #--------------------------------------------------------------------------------------------
     def onTimer(self, tid, userArg):
-        pass
+        if userArg == gametimer.TIMER_ITIMER_CALLBACK:
+            self._onTimerCallback(tid)
 
     def onSetRoomSeed(self, roomSeed):
         self.seed = roomSeed
@@ -71,18 +71,16 @@ class Avatar(KBEngine.Entity, EntityCommon):
         if exposed != self.id:
             return
 
-        if not self._jumpCheck(pressCount, finalPos, curIndex):
+        finalX, tCost = self._calcJump(pressCount)
+        if not self._jumpCheck(finalX, finalPos, curIndex):
             ERROR_MSG('check jump error:', self.curPos, pressCount, finalPos)
-            self.client.onJumpResult(False)
-            self.otherClients.onJump(pressCount, finalPos, -1)
-            self._notifyRoomReset()
-            return
+            curIndex = -1
 
         self.otherClients.onJump(pressCount, finalPos, curIndex)
         if curIndex == -1:
             self._modifyHp(-1)
             if self.HP == 0:
-                self.getCurrRoom().onAvatarDied(self.id)
+                self._callback(tCost / 1000, '_onMeDied', ())
                 return
 
             self.curIndex += 1
@@ -94,8 +92,11 @@ class Avatar(KBEngine.Entity, EntityCommon):
             self.curIndex = curIndex
             self.client.onJumpResult(True)
 
-    def _jumpCheck(self, pressCount, finalPos, curIndex):
-        finalX = self._calcJump(pressCount)
+    def _onMeDied(self):
+        DEBUG_MSG('ckz: _onMeDied')
+        self.getCurrRoom().onAvatarDied(self.id)
+
+    def _jumpCheck(self, finalX, finalPos, curIndex):
         if abs(finalX - finalPos[0]) > 0.01:
             ERROR_MSG('jump pos wrong:', finalX, finalPos)
             return False
@@ -131,7 +132,7 @@ class Avatar(KBEngine.Entity, EntityCommon):
         xB = xSpeed / 1000
         tCost = - yB / yC
         finalX = xA + tCost * xB
-        return finalX
+        return finalX, tCost
 
     def leaveRoom(self, exposed):
         self.destroy()
