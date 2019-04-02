@@ -13,3 +13,4 @@ item_create_prob = 0.4
 small_map_scale = 0.125
 my_item_max = 4.0
 hp_max = 3.0
+flat_y = -179.0

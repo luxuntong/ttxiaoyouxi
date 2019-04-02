@@ -1,6 +1,3 @@
-const {ccclass, property} = cc._decorator;
-var KBEngine = require("kbengine")
-import {STATE_CONFLICT} from "../CONST/conflict_data"
 const STATE_CHANGE = {
     doubleSave: 0,
     change: 1,
@@ -11,22 +8,23 @@ const STATE_CHANGE = {
  * 1： 切换并重置
  * 2： 不能切换
  */
-@ccclass
-export class AvatarState extends cc.Component {
+export class State {
     protected state:number = 1;
-    onLoad(){
-
+    protected conflictTable = null;
+    constructor (conflictTable) {
+        this.conflictTable = conflictTable;
+        this.state = 0;
     }
     protected checkSetState(statePos){
         //console.log("check statePos:", statePos, STATE_CONFLICT);
-        var conflictList = STATE_CONFLICT[statePos];
+        var conflictList = this.conflictTable[statePos];
         for (var oriPos = 0; oriPos < conflictList.length; oriPos++){
             if (!this.getState(oriPos)){
                 continue;
             }
 
             if (conflictList[oriPos] == STATE_CHANGE.cant){
-                KBEngine.DEBUG_MSG("ckz check failed:");
+                console.log("ckz check failed:");
                 console.log(statePos, this.state, oriPos, conflictList);
                 return false;
             }
@@ -43,7 +41,7 @@ export class AvatarState extends cc.Component {
         return true;
     }
     protected cleanConflict(statePos){
-        var conflictList = STATE_CONFLICT[statePos];
+        var conflictList = this.conflictTable[statePos];
         for (var oriPos = 0; oriPos < conflictList.length; oriPos++){
             if (!this.getState(oriPos)){
                 continue;
@@ -62,6 +60,9 @@ export class AvatarState extends cc.Component {
     }
     public getState(statePos){
         return this.state & (1 << statePos);
+    }
+    public clearAll() {
+        this.state = 0;
     }
     public reset(){
         this.state = 1;

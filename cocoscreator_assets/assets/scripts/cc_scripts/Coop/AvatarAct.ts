@@ -4,7 +4,8 @@ import {datas as AVATAR_STATE} from "../CONST/conflict_data_state";
 import {datas as ITEMD} from "../CONST/item_data"
 import {datas as SDD} from "../CONST/single_data";
 import {NewClass as CoopScene} from "./CoopScene"
-import {AvatarState} from "../Jump/AvatarState"
+import {State} from "../Jump/AvatarState"
+import {STATE_CONFLICT} from "../CONST/conflict_data"
 
 const ActionType = {
     jump: 0
@@ -15,8 +16,7 @@ export class NewClass extends cc.Component {
     @property(cc.Node)
     private pickTouchRange: cc.Node = null;
 
-    @property(cc.Node)
-    private stateControl: AvatarState = null;
+    private stateControl: State = null;
 
     @property(cc.Node)
     protected world: CoopScene = null;
@@ -99,10 +99,11 @@ export class NewClass extends cc.Component {
         }
         //this.world.onGetItem(flatIndex);
     }
-    public setNode(world, pickTouchRange, stateCtl){
+    public setNode(world, pickTouchRange){
         this.world = world;
         this.pickTouchRange = pickTouchRange;
-        this.stateControl = stateCtl;
+        this.stateControl = new State(STATE_CONFLICT);
+        this.stateControl.reset();
     }
     public setIsPlayer(isPlayer){
         this.isPlayer = isPlayer;
