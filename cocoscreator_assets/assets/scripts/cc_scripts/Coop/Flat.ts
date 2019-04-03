@@ -13,6 +13,13 @@ export class Flat extends cc.Component {
     protected item: cc.Node = null;
     protected actionState: State = null;
 
+    onDestroy() {
+        if (this.item != null) {
+            this.item.destroy();
+            this.item = null;
+        }
+    }
+
     protected randomFromIndex(index) {
         return this.world.randomWithIndex(this.index * SDD.random_range + index);
     }
@@ -51,6 +58,10 @@ export class Flat extends cc.Component {
             return;
         }
 
+        if (this.index == 0) {
+            return;
+        }
+        console.log("random item:", this.index, this.actionState);
         if (this.randomFromIndex(RIDD.has_item) < SDD.item_create_prob) {
             let flatWidth = this.node.scaleX * this.node.width;
             let newItem = cc.instantiate(itemPrefab);
@@ -59,7 +70,7 @@ export class Flat extends cc.Component {
             let x = this.centerRandom(pos.x, flatWidth, this.randomFromIndex(RIDD.item_posx));
             let y = this.getSurfaceHigh() + newItem.height * newItem.scaleY / 2;
             newItem.setPosition(cc.v2(x, y));
-            this.node.addChild(newItem);
+            this.node.parent.addChild(newItem);
             this.item = newItem;
             newItem['fatherObj'] = this;
         }
@@ -94,7 +105,7 @@ export class Flat extends cc.Component {
     }
 
     public isOnMe(x) {
-        let half = this.node.scaleX * this.node.scaleX / 2;
+        let half = this.node.scaleX * this.node.width / 2;
         if ((this.node.x - half <= x) && (this.node.x + half >= x)) {
             return true;
         }

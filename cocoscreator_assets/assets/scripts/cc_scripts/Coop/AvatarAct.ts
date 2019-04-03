@@ -72,8 +72,8 @@ export class NewClass extends cc.Component {
 
     // onLoad () {},
     protected onCollisionEnter(other, self){
-        console.log('get item:', other, self)
         if (other.name.startsWith("debuff")){
+            console.log('get item:', other, self, other.node.fatherObj.getIndex());
             let player = KBEngine.app.player();
             if(player != undefined && player.inWorld && player.id == this.eid) {
                 player.getItem(other.node.fatherObj.getIndex());

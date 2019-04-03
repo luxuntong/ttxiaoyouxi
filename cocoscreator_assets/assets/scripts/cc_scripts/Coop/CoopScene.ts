@@ -307,6 +307,11 @@ export class NewClass extends BaseScene {
 
     //创建我获得的道具
     protected createMyItem(itemIndex) {
+        console.log('create my item:', itemIndex)
+        if (itemIndex == -1) {
+            return;
+        }
+
         if (itemIndex in this.myItems){
             if (this.myItems[itemIndex].item != null) {
                 KBEngine.ERROR_MSG("get err item index" + itemIndex);
@@ -359,7 +364,7 @@ export class NewClass extends BaseScene {
 
     protected getFlatInfo(index): State{
         if (index in this.flatInfo) {
-            this.flatInfo[index];
+            return this.flatInfo[index];
         }
         return null;
     }
@@ -368,6 +373,7 @@ export class NewClass extends BaseScene {
         let flat = cc.instantiate(this.flatPrefab);
         let flatScript = flat.addComponent(Flat);
         this.node.addChild(flat);
+        console.log('ckz create flat:', index, this.flatInfo, this.getFlatInfo(index));
         flatScript.init(index, this, this.itemPrefab, this.getFlatInfo(index));
         return flat;
     }

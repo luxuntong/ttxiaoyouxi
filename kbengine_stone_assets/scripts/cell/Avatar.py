@@ -162,7 +162,7 @@ class Avatar(KBEngine.Entity, EntityCommon, iTimer.ITimer):
 
         if not curRoom.isHasItem(index):
             ERROR_MSG('get item invalid index;', index)
-            curRoom.onNotifyReset(True)
+            # curRoom.onNotifyReset(True)
             return
 
         self.allClients.onGetItem(self.id, index, self._getNewItem())
