@@ -76,7 +76,7 @@ export class NewClass extends cc.Component {
         if (other.name.startsWith("debuff")){
             let player = KBEngine.app.player();
             if(player != undefined && player.inWorld && player.id == this.eid) {
-                player.getItem(other.node.fatherObj.index);
+                player.getItem(other.node.fatherObj.getIndex());
             }
         }
     }

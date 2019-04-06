@@ -305,6 +305,7 @@ export class NewClass extends BaseScene {
         act.onModifyHp(eid, hp);
     }
 
+    //创建我获得的道具
     protected createMyItem(itemIndex) {
         if (itemIndex in this.myItems){
             if (this.myItems[itemIndex].item != null) {
@@ -394,12 +395,14 @@ export class NewClass extends BaseScene {
         }
         return -1;
     }
+
     public onCompleted(isWin) {
         if (!isWin){
             this.resetEntities();
             this.reset();
         }
     }
+
     protected resetEntities() {
         for (let eid in this.entities) {
             let entity = this.entities[eid];
@@ -407,26 +410,31 @@ export class NewClass extends BaseScene {
             eCtl.reset();
         }
     }
+
     protected reset() {
         this.destroyAllFlat();
         this.initOnReset();
         this.curScoreDisplay.string = "cur: 0";
         this.init();
     }
+
     protected initOnReset() {
         this.initFlat();
         this.initAction();
         this.destroyMyItem();
     }
+
     protected initAction() {
         this.actionList = new Array();
     }
+
     protected destroyAllFlat() {
         console.log('destroy all');
         for (let fIndex in this.flats){
             this.destroyFlat(fIndex);
         }
     }
+
     protected isFlatInUse(fIndex){
         for (let eid in this.entities) {
             let entity = this.entities[eid];
@@ -446,6 +454,7 @@ export class NewClass extends BaseScene {
         flat.destroy();
         delete this.flats[index];
     }
+
     protected clearFlat(){
         for (let fIndex in this.flats) {
             if (!this.isFlatInUse(fIndex)) {

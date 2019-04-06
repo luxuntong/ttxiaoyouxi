@@ -65,6 +65,10 @@ export class Flat extends cc.Component {
         }
     }
 
+    public getIndex() {
+        return this.index;
+    }
+
     public setState(stateValue) {
         if (this.actionState == null) {
             this.actionState = new State(actionConflict);
