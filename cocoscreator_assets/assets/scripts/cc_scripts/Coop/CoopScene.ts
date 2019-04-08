@@ -26,12 +26,6 @@ export class NewClass extends BaseScene {
     @property(cc.Prefab)
     private itemPrefab: cc.Prefab = null;
 
-    @property(cc.Label)
-    private curScoreDisplay: cc.Label = null;
-
-    @property(cc.Label)
-    private highScoreDisplay: cc.Label = null;
-
     @property(cc.Camera)
     private cameraUp: cc.Camera = null;
 
@@ -53,6 +47,12 @@ export class NewClass extends BaseScene {
     @property(cc.Node)
     protected account: cc.Node = null;
 
+    @property(cc.Node)
+    protected UIRoot: cc.Node = null;    
+
+
+    private curScoreDisplay: cc.Label = null;
+    private highScoreDisplay: cc.Label = null;
     private player:AvatarAct = null;
     protected flatStart = 0;
     protected flats = null;
@@ -80,12 +80,33 @@ export class NewClass extends BaseScene {
         this.initDisplay();
         this.initPhyx();
         this.init();
+        this.initGM();
         this.myItems = {};
         this.uiRoot = cc.find("UIRoot");
         this.account.active = false;
     }
     protected init() {
     }
+
+    protected initGM() {
+        let GMRoot = cc.find("GM", this.UIRoot);
+        if (GMRoot == null) {
+            return;
+        }
+
+        let GMButton = cc.find("GM_button", GMRoot);
+        let GMEdit: cc.EditBox = cc.find("GM_edit", GMRoot).getComponent(cc.EditBox);
+        let that = this;
+        GMButton.on(cc.Node.EventType.TOUCH_START, function() {
+            let gmStr = GMEdit.string;
+            that.onGM(gmStr);
+        });
+    }
+
+    protected onGM(gmStr) {
+        console.log("gm:", gmStr);
+    }
+
     protected initPhyx() {
         var manager = cc.director.getCollisionManager();
         manager.enabled = true;
@@ -142,6 +163,8 @@ export class NewClass extends BaseScene {
         noUseObj.back.x = index * this.backWidth;        
     }
     protected initDisplay() {
+        this.curScoreDisplay = cc.find("curScore", this.UIRoot).getComponent(cc.Label);
+        this.highScoreDisplay = cc.find("highScore", this.UIRoot).getComponent(cc.Label);
         this.high = 0;
         this.curScoreDisplay.string = 'cur: 0';
         this.highScoreDisplay.string = 'high: 0';

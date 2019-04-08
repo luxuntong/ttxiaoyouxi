@@ -1,0 +1,31 @@
+{
+  "ver": "2.2.0",
+  "uuid": "2614a2d1-0223-403e-9f6c-d0580b7a5025",
+  "type": "sprite",
+  "wrapMode": "clamp",
+  "filterMode": "bilinear",
+  "premultiplyAlpha": false,
+  "subMetas": {
+    "团子被吃了": {
+      "ver": "1.0.3",
+      "uuid": "57da7c59-acc7-4202-9d81-f0b7b9f84fe7",
+      "rawTextureUuid": "2614a2d1-0223-403e-9f6c-d0580b7a5025",
+      "trimType": "auto",
+      "trimThreshold": 1,
+      "rotated": false,
+      "offsetX": 0,
+      "offsetY": 0,
+      "trimX": 0,
+      "trimY": 0,
+      "width": 228,
+      "height": 230,
+      "rawWidth": 228,
+      "rawHeight": 230,
+      "borderTop": 0,
+      "borderBottom": 0,
+      "borderLeft": 0,
+      "borderRight": 0,
+      "subMetas": {}
+    }
+  }
+}
