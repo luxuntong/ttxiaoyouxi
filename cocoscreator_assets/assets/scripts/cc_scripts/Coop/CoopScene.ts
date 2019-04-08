@@ -415,10 +415,10 @@ export class NewClass extends BaseScene {
         return this.flatY + this.flatPrefab.data.height / 2;
     }
 
-    public getFlatIndex(x) {
+    public getFlatIndex(x, width) {
         for (let fIndex in this.flats){
             let flatSc: Flat = this.flats[fIndex].getComponent(Flat);
-            if (flatSc.isOnMe(x)) {
+            if (flatSc.isOnMe(x, width)) {
                 return parseInt(fIndex);
             }
         }

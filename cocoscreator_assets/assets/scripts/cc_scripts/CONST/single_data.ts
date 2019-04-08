@@ -14,6 +14,7 @@ const datas = {
     small_map_scale: 0.125,
     my_item_max: 4.0,
     hp_max: 3.0,
-    flat_y: -179.0
+    flat_y: -179.0,
+    avatar_width: 100.0
 };
 export {datas};

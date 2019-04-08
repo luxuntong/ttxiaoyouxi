@@ -294,6 +294,10 @@ export class NewClass extends cc.Component {
         return pressCost + 200;
     }
 
+    protected getWidth() {
+        return this.node.scaleX * SDD.avatar_width;
+    }
+
     protected doJump(pressCount) {
         let angle = 40 * Math.PI / 180;
         let xSpeed = pressCount * Math.sin(angle);
@@ -306,7 +310,7 @@ export class NewClass extends cc.Component {
         let tCost = - this.yB / this.yC;
         let finalX = this.xA + tCost * this.xB;
         this.finalPos = cc.v2(finalX, this.yA);
-        this.curIndex = this.world.getFlatIndex(finalX);
+        this.curIndex = this.world.getFlatIndex(finalX, this.getWidth());
         this.releaseTime = (new Date()).valueOf();
         return pressCount;
     }

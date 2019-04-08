@@ -104,9 +104,9 @@ export class Flat extends cc.Component {
         }
     }
 
-    public isOnMe(x) {
+    public isOnMe(x, width) {
         let half = this.node.scaleX * this.node.width / 2;
-        if ((this.node.x - half <= x) && (this.node.x + half >= x)) {
+        if ((this.node.x - half <= x + width / 2) && (this.node.x + half >= x - width / 2)) {
             return true;
         }
 
