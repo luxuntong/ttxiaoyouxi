@@ -19,6 +19,8 @@ class Avatar(KBEngine.Entity, EntityCommon, iTimer.ITimer):
         self.startPosition = copy.deepcopy(self.position)
         self.getCurrRoom().onEnter(self)
         self.reset(False)
+        self.avatarRate = SDD.avatar_scale_x
+        self.avatarWidth = int(SDD.avatar_width * self.avatarRate)
         self.items = {}
         DEBUG_MSG("new avatar cell: id=%i accountName=%s  avatarName=%s spaceID=%i" % (self.id, self.accountName, self.avatarName, self.spaceID))
 
@@ -106,7 +108,7 @@ class Avatar(KBEngine.Entity, EntityCommon, iTimer.ITimer):
             ERROR_MSG('get room failed')
             return False
 
-        retIndex = curRoom.getFlatIndexByPos(finalPos[0], self.curIndex)
+        retIndex = curRoom.getFlatIndexByPos(finalPos[0], self.curIndex, self.avatarWidth)
         if retIndex != curIndex:
             ERROR_MSG('index invalid:', retIndex, curIndex)
             return False

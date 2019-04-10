@@ -140,9 +140,9 @@ class Room(KBEngine.Entity):
 
         return 200 * scaleX
 
-    def getFlatIndexByPos(self, x, startIndex):
+    def getFlatIndexByPos(self, x, startIndex, width):
         for i in range(startIndex, startIndex + 20):
-            if self._isInFlat(x, i):
+            if self._isInFlat(x, i, width):
                 return i
 
         return -1
@@ -154,11 +154,11 @@ class Room(KBEngine.Entity):
         self.itemGetSet.add(index)
         return self._randomFromIndex(index, RIDD.has_item) < SDD.item_create_prob
 
-    def _isInFlat(self, x, index):
+    def _isInFlat(self, x, index, avatarWidth):
         posX = self._getFlatPosX(index)
         width = self._getFlatWidth(index)
         half = width / 2
-        return posX - half < x < posX + half
+        return posX - half < x + avatarWidth / 2 and x - avatarWidth / 2 < posX + half
 
     def _centerRandom(self, center, diameter, randomValue):
         radius = diameter / 2

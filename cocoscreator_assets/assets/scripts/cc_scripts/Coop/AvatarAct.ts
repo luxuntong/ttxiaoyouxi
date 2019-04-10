@@ -43,6 +43,7 @@ export class NewClass extends cc.Component {
     protected relivePos = null;
     protected HP = SDD.hp_max;
     protected hpNode:cc.Node = null;
+    protected entity = null;
 
 
     onDestroy() {
@@ -60,8 +61,9 @@ export class NewClass extends cc.Component {
         }
     }
 
-    public setEid(eid){
-        this.eid = eid;
+    public setEntity(entity){
+        this.entity = entity;
+        this.eid = entity.id;
     }
     
     // LIFE-CYCLE CALLBACKS:
@@ -150,6 +152,7 @@ export class NewClass extends cc.Component {
         else {
 		    KBEngine.Event.register("otherAvatarOnJump", this, "otherAvatarOnJump");
         }
+        KBEngine.Event.register("onModifyAvatarRate", this, "onModifyAvatarRate");
     }
 
     protected unInstallEvents() {
@@ -159,6 +162,14 @@ export class NewClass extends cc.Component {
         }
         else {
 		    KBEngine.Event.deregister("otherAvatarOnJump", this, "otherAvatarOnJump");
+        }
+        KBEngine.Event.deregister("onModifyAvatarRate", this, "onModifyAvatarRate");
+    }
+
+    protected onModifyAvatarRate(eid, rate) {
+        if (eid != this.eid){
+            KBEngine.ERROR_MSG('eid wrong ' + eid + ' ' + this.eid);
+            return;
         }
     }
 
@@ -294,10 +305,6 @@ export class NewClass extends cc.Component {
         return pressCost + 200;
     }
 
-    protected getWidth() {
-        return this.node.scaleX * SDD.avatar_width;
-    }
-
     protected doJump(pressCount) {
         let angle = 40 * Math.PI / 180;
         let xSpeed = pressCount * Math.sin(angle);
@@ -310,7 +317,7 @@ export class NewClass extends cc.Component {
         let tCost = - this.yB / this.yC;
         let finalX = this.xA + tCost * this.xB;
         this.finalPos = cc.v2(finalX, this.yA);
-        this.curIndex = this.world.getFlatIndex(finalX, this.getWidth());
+        this.curIndex = this.world.getFlatIndex(finalX, this.entity.avatarWidth);
         this.releaseTime = (new Date()).valueOf();
         return pressCount;
     }

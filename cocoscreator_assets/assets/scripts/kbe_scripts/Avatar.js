@@ -204,18 +204,13 @@ KBEngine.Avatar = KBEngine.Entity.extend({
         onJumpCompleted: function(eid) {
             KBEngine.Event.fire("onJumpCompleted", eid);
         },
-
-        //石头出界，重置石头
-        resetItem: function(itemID)
-        {
-            KBEngine.INFO_MSG("reset item ......");
-            this.cellCall("resetItem", itemID);
-        },
         set_HP: function(oldHp) {
             console.log('ckz set hp', oldHp);
             KBEngine.Event.fire("onModifyHp", this.id, this.HP);
         },
-
+        set_avatarWidth:function(oldWidth) {
+            KBEngine.Event.fire("onModifyAvatarWidth", this.id, this.avatarWidth);
+        },
         onResetItem: function(itemID, position)
         {
             KBEngine.INFO_MSG("on reset item position(" + position.x + ", " + position.y + ", " + position.z + ")");

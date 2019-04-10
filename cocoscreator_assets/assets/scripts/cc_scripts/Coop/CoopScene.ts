@@ -205,7 +205,7 @@ export class NewClass extends BaseScene {
         let aAct: AvatarAct = e.addComponent("AvatarAct");
         aAct.setStartPos(cc.v2(entity.position.x, this.getAvatarY()));
         aAct.setNode(this, pickTouchRange);
-        aAct.setEid(entity.id);
+        aAct.setEntity(entity);
         aAct.setIsPlayer(isPlayer);
         aAct.init();
         let cameraCtl;

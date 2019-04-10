@@ -61,7 +61,7 @@ export class Flat extends cc.Component {
         if (this.index == 0) {
             return;
         }
-        console.log("random item:", this.index, this.actionState);
+        
         if (this.randomFromIndex(RIDD.has_item) < SDD.item_create_prob) {
             let flatWidth = this.node.scaleX * this.node.width;
             let newItem = cc.instantiate(itemPrefab);
