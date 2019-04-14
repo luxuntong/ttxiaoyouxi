@@ -3,12 +3,18 @@ var KBEngine = require("kbengine");
 import {datas as AVATAR_STATE} from "../CONST/conflict_data_state";
 import {datas as ITEMD} from "../CONST/item_data"
 import {datas as SDD} from "../CONST/single_data";
+import {Flat} from "./Flat"
 import {NewClass as CoopScene} from "./CoopScene"
 import {State} from "../Jump/AvatarState"
 import {STATE_CONFLICT} from "../CONST/conflict_data"
 
 const ActionType = {
     jump: 0
+}
+
+export enum JumpMode {
+    normal,
+    auto
 }
 
 @ccclass
@@ -44,6 +50,8 @@ export class NewClass extends cc.Component {
     protected HP = SDD.hp_max;
     protected hpNode:cc.Node = null;
     protected entity = null;
+    protected mode = JumpMode.normal;
+    protected reliveIndex = 0;
 
 
     onDestroy() {
@@ -244,6 +252,7 @@ export class NewClass extends cc.Component {
         this.relivePos = null;
         this.stateControl.setState(AVATAR_STATE.idle);
         this.wiatJumpFlag = false;
+        this.curIndex = this.reliveIndex;
     }
 
     protected doAction() {
@@ -317,10 +326,32 @@ export class NewClass extends cc.Component {
         let tCost = - this.yB / this.yC;
         let finalX = this.xA + tCost * this.xB;
         this.finalPos = cc.v2(finalX, this.yA);
-        this.curIndex = this.world.getFlatIndex(finalX, this.entity.avatarWidth);
+        let curIndex = this.world.getFlatIndex(finalX, this.entity.avatarWidth);
+        if (curIndex == -1) {
+            this.reliveIndex = this.curIndex + 1;
+            if (this.mode == JumpMode.auto) {
+                let newPress = this.autoJump();
+                return this.doJump(newPress);
+            }
+        }
+        this.curIndex = curIndex;
         this.releaseTime = (new Date()).valueOf();
         return pressCount;
     }
+
+    public setMode(mode: JumpMode) {
+        this.mode = mode;
+    }
+
+    protected autoJump() {
+        let flat = this.world.getFlatByIndex(this.curIndex + 1).getComponent(Flat);
+        let posX = flat.getLandPosX();
+        let angle = 40 * Math.PI / 180;
+        let ret = (posX - this.node.x) / Math.sin(angle) * SDD.gravity / Math.cos(angle)
+        ret = Math.round(Math.sqrt(ret));
+        return ret;
+    }
+
     protected completed (isWin){
         this.world.onCompleted(isWin);
     }

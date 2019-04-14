@@ -3,40 +3,28 @@ import KBEngine = require("kbengine")
 import {datas as ITEMD} from "../CONST/item_data"
 import {datas as SDD} from "../CONST/single_data";
 import {datas as RIDD} from "../CONST/random_index_data";
-import {NewClass as AvatarAct} from "./AvatarAct"
+import {JumpMode, NewClass as AvatarAct} from "./AvatarAct"
 import {BaseScene} from "../common/BaseScene"
 import {State} from "../Jump/AvatarState"
 import {STATE_CONFLICT as actionConflict} from "../CONST/conflict_action"
 import {datas as ActionState} from "../CONST/conflict_action_state"
 import {Flat} from "./Flat"
+import {Msg} from "./Msg"
 
 //var seedrandom = require('seedrandom');
 //import {KBEngine} from "kbengine"
 @ccclass
 export class NewClass extends BaseScene {
     @property(cc.Prefab)
-    private playerPrefab: cc.Prefab = null;
+    protected playerPrefab: cc.Prefab = null;
 
-    @property(cc.Node)
-    private pickTouchRange: cc.Node = null;
-
-    @property(cc.Prefab)
-    private flatPrefab: cc.Prefab = null;
+    protected pickTouchRange: cc.Node = null;
 
     @property(cc.Prefab)
-    private itemPrefab: cc.Prefab = null;
+    protected flatPrefab: cc.Prefab = null;
 
-    @property(cc.Camera)
-    private cameraUp: cc.Camera = null;
-
-    @property(cc.Camera)
-    private cameraDown: cc.Camera = null;
-
-    @property(cc.Sprite)
-    protected smallWorld: cc.Sprite = null;
-
-    @property(cc.Mask)
-    protected smallMask: cc.Mask = null;
+    @property(cc.Prefab)
+    protected itemPrefab: cc.Prefab = null;
 
     @property(cc.Prefab)
     protected backPrefab: cc.Prefab = null;
@@ -44,16 +32,15 @@ export class NewClass extends BaseScene {
     @property(cc.Prefab)
     protected myItemPrefab: cc.Prefab = null;
 
-    @property(cc.Node)
+    protected cameraOther: cc.Camera = null;
+    protected cameraMy: cc.Camera = null;
+    protected smallWorld: cc.Sprite = null;
+    protected smallMask: cc.Mask = null;
     protected account: cc.Node = null;
-
-    @property(cc.Node)
     protected UIRoot: cc.Node = null;    
-
-
-    private curScoreDisplay: cc.Label = null;
-    private highScoreDisplay: cc.Label = null;
-    private player:AvatarAct = null;
+    protected curScoreDisplay: cc.Label = null;
+    protected highScoreDisplay: cc.Label = null;
+    protected player:AvatarAct = null;
     protected flatStart = 0;
     protected flats = null;
     protected flatY = -179
@@ -69,23 +56,30 @@ export class NewClass extends BaseScene {
     protected backWidth: number = null;
     protected flatInfo = null;
     protected myItems = null;
-    protected uiRoot: cc.Node = null;
+    protected msgCtl: Msg = null;
 
     protected onLoad(){
         //console.log('ckz coop load', seedrandom.random(500));
         this.initBack();
+        this.initUI();
+        this.init();
+        this.initCamera();
         this.installEvents();
         this.initEntities();
         this.initFlat();
-        this.initDisplay();
         this.initPhyx();
-        this.init();
         this.initGM();
         this.myItems = {};
-        this.uiRoot = cc.find("UIRoot");
         this.account.active = false;
     }
     protected init() {
+    }
+
+    protected initCamera() {
+        this.cameraMy = cc.find("camera/CameraMy").getComponent(cc.Camera);
+        this.cameraOther = cc.find("camera/CameraOther").getComponent(cc.Camera);
+        this.smallMask = cc.find("smallMask").getComponent(cc.Mask);
+        this.smallWorld = cc.find("smallWorld", this.smallMask.node).getComponent(cc.Sprite);
     }
 
     protected initGM() {
@@ -105,6 +99,12 @@ export class NewClass extends BaseScene {
 
     protected onGM(gmStr) {
         console.log("gm:", gmStr);
+        this.msgCtl.onMessage(gmStr);
+        switch (gmStr) {
+            case "$auto":
+                this.player.setMode(JumpMode.auto);
+                break;
+        }
     }
 
     protected initPhyx() {
@@ -162,12 +162,16 @@ export class NewClass extends BaseScene {
         noUseObj.index = index;
         noUseObj.back.x = index * this.backWidth;        
     }
-    protected initDisplay() {
+    protected initUI() {
+        this.UIRoot = cc.find("UIRoot");
         this.curScoreDisplay = cc.find("curScore", this.UIRoot).getComponent(cc.Label);
         this.highScoreDisplay = cc.find("highScore", this.UIRoot).getComponent(cc.Label);
         this.high = 0;
         this.curScoreDisplay.string = 'cur: 0';
         this.highScoreDisplay.string = 'high: 0';
+        this.msgCtl = new Msg(this.UIRoot);
+        this.pickTouchRange = cc.find("touchRange", this.UIRoot);
+        this.account = cc.find("account");
     }
     protected initEntities(){
         let entities = KBEngine.app.entities;
@@ -211,10 +215,10 @@ export class NewClass extends BaseScene {
         let cameraCtl;
         if (isPlayer) {
             this.player = aAct;
-            cameraCtl = this.cameraDown.addComponent('JumpCamera');
+            cameraCtl = this.cameraMy.addComponent('JumpCamera');
         }
         else {
-            cameraCtl = this.cameraUp.addComponent("JumpCamera");
+            cameraCtl = this.cameraOther.addComponent("JumpCamera");
         }
         
         cameraCtl.setTarget(e);
@@ -229,6 +233,7 @@ export class NewClass extends BaseScene {
         KBEngine.Event.register("onModifyHp", this, "onModifyHp");
         KBEngine.Event.register("onJumpCompleted", this, "onJumpCompleted");
         KBEngine.Event.register("onUseItemRet", this, "onUseItemRet");
+        
         
     }
 
@@ -347,7 +352,7 @@ export class NewClass extends BaseScene {
         this.myItems[itemIndex].item = item
         item.scaleX = SDD.item_scale_x;
         item.scaleY = SDD.item_scale_y;
-        this.uiRoot.addChild(item);
+        this.UIRoot.addChild(item);
         item.x = 100 + itemIndex * 100;
         item.y = 100;
         console.log('create my item:', item);
@@ -502,6 +507,10 @@ export class NewClass extends BaseScene {
                 }
             }
         }
+    }
+
+    public getFlatByIndex(index):Flat{
+        return this.flats[index];
     }
 
     public onPlayerLanded (eid) {

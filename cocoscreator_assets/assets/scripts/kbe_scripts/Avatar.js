@@ -211,6 +211,9 @@ KBEngine.Avatar = KBEngine.Entity.extend({
         set_avatarWidth:function(oldWidth) {
             KBEngine.Event.fire("onModifyAvatarWidth", this.id, this.avatarWidth);
         },
+        set_avatarRate:function(oldRate) {
+            KBEngine.Event.fire("onModifyAvatarRate", this.id, this.avatarRate);
+        },
         onResetItem: function(itemID, position)
         {
             KBEngine.INFO_MSG("on reset item position(" + position.x + ", " + position.y + ", " + position.z + ")");

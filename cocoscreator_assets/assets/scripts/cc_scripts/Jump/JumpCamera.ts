@@ -15,7 +15,7 @@ export class JumpCamera extends cc.Component {
         this.isplayer = isplayer;
         this.vsSize = cc.view.getVisibleSize();
         this.origin = cc.view.getVisibleOrigin()
-        this.node.y = this.vsSize.height / 2;
+        this.node.y = 0;
 
         if (!isplayer) {
             
