@@ -45,7 +45,7 @@ export class HallScene extends BaseScene {
         super.unInstallEvents();
     }
 
-    protected onAvatarEnterWorld(avatar){
+    public onAvatarEnterWorld(avatar){
         console.log("ckz onAvatarEnterWorld", avatar)
         cc.director.loadScene("CoopScene", ()=> {
             KBEngine.INFO_MSG("load jump scene finished");

@@ -97,9 +97,18 @@ export class Flat extends cc.Component {
         }
     }
 
+    public getRelivePos() {
+        return this.node.x;
+    }
+
     public getLandPosX() {
         let flatWidth = this.node.scaleX * this.node.width;
-        return parseInt(this.node.x - flatWidth / 2) + 5;
+        return Math.floor(this.node.x - flatWidth / 2) + 5;
+    }
+
+    public getLandRange() {
+        let flatWidth = this.node.scaleX * this.node.width;
+        return [Math.floor(this.node.x - flatWidth / 2), Math.floor(this.node.x + flatWidth / 2)];
     }
 
     public destoryItem() {

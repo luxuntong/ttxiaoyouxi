@@ -15,6 +15,8 @@ const datas = {
     my_item_max: 4.0,
     hp_max: 3.0,
     flat_y: -179.0,
-    avatar_width: 100.0
+    avatar_width: 100.0,
+    avatar_start_pos_x: -475.0,
+    avatar_start_pos_y: -69.0
 };
 export {datas};

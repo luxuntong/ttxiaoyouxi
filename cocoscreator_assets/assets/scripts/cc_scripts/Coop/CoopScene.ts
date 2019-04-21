@@ -4,6 +4,7 @@ import {datas as ITEMD} from "../CONST/item_data"
 import {datas as SDD} from "../CONST/single_data";
 import {datas as RIDD} from "../CONST/random_index_data";
 import {JumpMode, NewClass as AvatarAct} from "./AvatarAct"
+import {SingleEntity} from "../Single/SingleEntity"
 import {BaseScene} from "../common/BaseScene"
 import {State} from "../Jump/AvatarState"
 import {STATE_CONFLICT as actionConflict} from "../CONST/conflict_action"
@@ -41,6 +42,7 @@ export class NewClass extends BaseScene {
     protected curScoreDisplay: cc.Label = null;
     protected highScoreDisplay: cc.Label = null;
     protected player:AvatarAct = null;
+    protected playerEntity:SingleEntity = null;
     protected flatStart = 0;
     protected flats = null;
     protected flatY = -179
@@ -126,15 +128,15 @@ export class NewClass extends BaseScene {
             })
         }
     }
-    public getInWhichBack(x) {
-        for (let backObj of this.backPool) {
-            let half = this.backWidth;
-            if (backObj.back.x - half <= x && backObj.back.x + half >= x)
-            {
-                return backObj.index;
-            }
+    public getInWhichBack(x): number {
+        let half = this.backWidth;
+        let index = Math.floor(x / this.backWidth);
+        if (x % this.backWidth < half) {
+            return index;
         }
-        return -1;
+        else {
+            return index + 1;
+        }
     }
 
     protected isBackNotUse(backObj) {
@@ -215,6 +217,7 @@ export class NewClass extends BaseScene {
         let cameraCtl;
         if (isPlayer) {
             this.player = aAct;
+            this.playerEntity = entity;
             cameraCtl = this.cameraMy.addComponent('JumpCamera');
         }
         else {
@@ -223,6 +226,7 @@ export class NewClass extends BaseScene {
         
         cameraCtl.setTarget(e);
         cameraCtl.init(isPlayer, this.smallWorld, this.smallMask);
+        return e;
     }
 
     protected installEvents(){
@@ -283,7 +287,7 @@ export class NewClass extends BaseScene {
         }
     }
 
-    protected onUseItemRet(eid, itemIndex, itemType, flatIndex) {
+    public onUseItemRet(eid, itemIndex, itemType, flatIndex) {
         if (this.player.isMe(eid)) {
             if (itemIndex in this.myItems && this.myItems[itemIndex].item) {
                 this.myItems[itemIndex].item.destroy();
@@ -375,10 +379,7 @@ export class NewClass extends BaseScene {
     }
 
     protected clickItem(itemIndex) {
-        let player = KBEngine.app.player();
-        if(player != undefined && player.inWorld) {
-            player.useItem(itemIndex, this.getEnemyEid());
-        }
+        this.playerEntity.useItem(itemIndex, this.getEnemyEid());
     }
 
     protected destroyMyItem() {

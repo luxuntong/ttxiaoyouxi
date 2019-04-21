@@ -7,6 +7,7 @@ import {Flat} from "./Flat"
 import {NewClass as CoopScene} from "./CoopScene"
 import {State} from "../Jump/AvatarState"
 import {STATE_CONFLICT} from "../CONST/conflict_data"
+import {SingleEntity} from "../Single/SingleEntity"
 
 const ActionType = {
     jump: 0
@@ -49,9 +50,10 @@ export class NewClass extends cc.Component {
     protected relivePos = null;
     protected HP = SDD.hp_max;
     protected hpNode:cc.Node = null;
-    protected entity = null;
+    protected entity: SingleEntity = null;
     protected mode = JumpMode.normal;
     protected reliveIndex = 0;
+    public tCost:number;
 
 
     onDestroy() {
@@ -84,10 +86,7 @@ export class NewClass extends cc.Component {
     protected onCollisionEnter(other, self){
         if (other.name.startsWith("debuff")){
             console.log('get item:', other, self, other.node.fatherObj.getIndex());
-            let player = KBEngine.app.player();
-            if(player != undefined && player.inWorld && player.id == this.eid) {
-                player.getItem(other.node.fatherObj.getIndex());
-            }
+            this.entity.getItem(other.node.fatherObj.getIndex());
         }
     }
 
@@ -181,7 +180,7 @@ export class NewClass extends cc.Component {
         }
     }
 
-    protected onJumpResult(eid, ret) {
+    public onJumpResult(eid, ret) {
         console.log('ckz jump result:', ret);
         if (eid != this.eid){
             KBEngine.ERROR_MSG('eid wrong ' + eid + ' ' + this.eid);
@@ -276,6 +275,9 @@ export class NewClass extends cc.Component {
         this.curIndex = action.curIndex;
     }
 
+    public getCurIndex() {
+        return this.curIndex;
+    }
     
     protected onMouseDown (event){
         if (this.wiatJumpFlag) {
@@ -301,17 +303,28 @@ export class NewClass extends cc.Component {
         this.pressCost = this.preDealPress(this.pressCost);
         //console.log("ckz press", this.pressCost);
         this.pressCost = this.doJump(this.pressCost);
-        let player = KBEngine.app.player();
         this.wiatJumpFlag = true;
-        if(player != undefined && player.inWorld && player.id == this.eid) {
-            player.jump(this.pressCost, [this.finalPos.x, this.finalPos.y], this.curIndex);
-        }
+        this.entity.jump(this.pressCost, [this.finalPos.x, this.finalPos.y], this.curIndex);
     }
     protected preDealPress(pressCost) {
         if (pressCost > 1500){
             pressCost = 1500;
         }
         return pressCost + 200;
+    }
+
+    public aiJump(pressCost) {
+        if(!this.stateControl.setState(AVATAR_STATE.storage))
+        {
+            return;
+        }
+        if(!this.stateControl.setState(AVATAR_STATE.fly))
+        {
+            return;
+        }
+        this.pressCost = this.doJump(pressCost);
+        this.wiatJumpFlag = true;
+        this.entity.jump(this.pressCost, [this.finalPos.x, this.finalPos.y], this.curIndex);
     }
 
     protected doJump(pressCount) {
@@ -323,8 +336,8 @@ export class NewClass extends cc.Component {
         this.yC = - SDD.gravity / 1000000;
         this.xA = this.node.x;
         this.xB = xSpeed / 1000;
-        let tCost = - this.yB / this.yC;
-        let finalX = this.xA + tCost * this.xB;
+        this.tCost = - this.yB / this.yC;
+        let finalX = this.xA + this.tCost * this.xB;
         this.finalPos = cc.v2(finalX, this.yA);
         let curIndex = this.world.getFlatIndex(finalX, this.entity.avatarWidth);
         if (curIndex == -1) {
@@ -364,9 +377,15 @@ export class NewClass extends cc.Component {
         this.stateControl.reset();
         this.initItems();
     }
+
+    public setTimer(delay, func) {
+        this.scheduleOnce(func, delay);
+    }
+
     protected update (dt){
         let backIndex = this.world.getInWhichBack(this.node.x);
         if (backIndex != this.curBackIndex) {
+            console.log('set back index:', backIndex);
             this.curBackIndex = backIndex;
             this.world.setBackByIndex(backIndex + 1);
         }

@@ -21,7 +21,7 @@ class Avatar(KBEngine.Proxy):
         self.cellData["dbid"] = self.databaseID
         self.cellData["modelID"] = 0
         self.cellData["accountName"] = self.__ACCOUNT_NAME__
-        self.cellData["position"] = (-475, 0, -69)
+        self.cellData["position"] = (SDD.avatar_start_pos_x, 0, SDD.avatar_start_pos_y)
         self.cellData["avatarName"] = ""
         self.cellData['HP'] = int(SDD.hp_max)
 
