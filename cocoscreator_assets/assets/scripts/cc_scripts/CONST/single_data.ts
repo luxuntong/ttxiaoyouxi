@@ -2,8 +2,8 @@ const datas = {
     flat_x_random_range: 200.0,
     flat_random_width: 0.2,
     flat_spacing: 400.0,
-    avatar_scale_x: 0.2,
-    avatar_scale_y: 0.2,
+    avatar_scale_x: 0.4,
+    avatar_scale_y: 0.4,
     item_scale_x: 0.2,
     item_scale_y: 0.2,
     gravity: 1000.0,
@@ -17,6 +17,7 @@ const datas = {
     flat_y: -179.0,
     avatar_width: 100.0,
     avatar_start_pos_x: -475.0,
-    avatar_start_pos_y: -69.0
+    avatar_start_pos_y: -69.0,
+    flat_height_scale: 0.5
 };
 export {datas};

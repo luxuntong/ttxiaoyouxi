@@ -119,6 +119,9 @@
 
         <onLeaveRoom>
         </onLeaveRoom>
+
+        <cancelMatch> <Exposed/>
+        </cancelMatch>
     </BaseMethods>
 
     <CellMethods>
@@ -236,6 +239,9 @@
             <Arg>   UINT8           </Arg>
             <Arg>   FLAT_INDEX      </Arg>
         </onUseItemRet>
+
+        <onMatchCanceled>
+        </onMatchCanceled>
     </ClientMethods>
 
 </root>

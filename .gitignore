@@ -76,4 +76,5 @@ logs
 *.project
 /plan/*.pydevproject
 node_modules
+~*
 venv

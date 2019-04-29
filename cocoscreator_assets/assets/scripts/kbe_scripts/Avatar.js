@@ -27,7 +27,13 @@ KBEngine.Avatar = KBEngine.Entity.extend({
             KBEngine.INFO_MSG("avatar " + this.id + " match coop");
             this.baseCall("matchCoop");
         },
-                   
+        cancelMatch: function() {
+            KBEngine.INFO_MSG("avatar " + this.id + " cancel match");
+            this.baseCall("cancelMatch");
+        },
+        onMatchCanceled: function() {
+            KBEngine.Event.fire("onMatchCanceled");
+        },  
         onEnterWorld : function()
         {
             KBEngine.DEBUG_MSG("avatar onenter world");

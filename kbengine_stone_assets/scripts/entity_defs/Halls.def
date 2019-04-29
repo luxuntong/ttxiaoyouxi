@@ -7,8 +7,13 @@
 
     <BaseMethods>
         <onRoomLoseCell>
-            <Arg>        SPACE_KEY        </Arg>
+            <Arg>       SPACE_KEY           </Arg>
         </onRoomLoseCell>
+
+        <cancelMatch>
+            <Arg>       ENTITYCALL          </Arg>
+            <Arg>       PLAYER_GBID         </Arg>
+        </cancelMatch>
     </BaseMethods>
 
     <CellMethods>

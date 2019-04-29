@@ -41,6 +41,7 @@ export class Flat extends cc.Component {
         let pos = cc.v2(x, SDD.flat_y)
         this.node.setPosition(pos);
         this.node.scaleX = 1 + SDD.flat_random_width * this.randomFromIndex(RIDD.flat_scalex);
+        this.node.scaleY = SDD.flat_height_scale;
         if (this.actionState && this.actionState.getState(ActionState.flatNarrow)) {
             this.node.scaleX *= 0.5;
         }

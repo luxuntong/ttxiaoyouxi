@@ -418,7 +418,7 @@ export class NewClass extends BaseScene {
     }
 
     protected getAvatarY() {
-        return this.flatY + this.flatPrefab.data.height / 2;
+        return this.flatY + this.flatPrefab.data.height * SDD.flat_height_scale / 2;
     }
 
     public getFlatIndex(x, width) {

@@ -39,23 +39,18 @@
   "design-resolution-height": 640,
   "design-resolution-width": 1136,
   "excluded-modules": [
-    "CCSpriteDistortion",
-    "LabelOutline",
     "ParticleSystem",
     "TiledMap",
     "Spine Skeleton",
-    "ScrollBar",
-    "ScrollView",
+    "DragonBones",
+    "MotionStreak",
     "Toggle",
     "PageView",
     "PageViewIndicator",
     "Slider",
     "VideoPlayer",
     "WebView",
-    "MotionStreak",
-    "DragonBones",
-    "StudioComponent",
-    "Chipmunk"
+    "StudioComponent"
   ],
   "facebook": {
     "appID": "",
@@ -76,7 +71,7 @@
     "UI",
     "back"
   ],
-  "last-module-event-record-time": 1554042337649,
+  "last-module-event-record-time": 1556114724787,
   "simulator-orientation": false,
   "simulator-resolution": {
     "height": 640,

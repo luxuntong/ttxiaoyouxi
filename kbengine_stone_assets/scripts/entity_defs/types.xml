@@ -11,4 +11,5 @@
     <GBID>                  UINT64              </GBID>
     <SEED>                  UINT16              </SEED>
     <FLAT_INDEX>            UINT16              </FLAT_INDEX>
+    <PLAYER_GBID>           UINT64              </PLAYER_GBID>
 </root>

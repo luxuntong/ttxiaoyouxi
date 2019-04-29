@@ -22,7 +22,14 @@ class Halls(KBEngine.Entity):
         # enterRoomReqs, 在房间未创建完成前， 请求进入房间和登陆到房间的请求记录在此，等房间建立完毕将他们扔到space中
         self.matchPools = {}
         self.rooms = {}
-        self.lastNewRoomKey = 0
+
+    def cancelMatch(self, box, gbId):
+        if gbId not in self.matchPools:
+            ERROR_MSG('cancelMatch failed that not in match pool', gbId)
+            return
+
+        self.matchPools.pop(gbId)
+        box.client.onMatchCanceled()
 
     def matchCoop(self, box, gbID):
         DEBUG_MSG('ckz: hall match coop', gbID)

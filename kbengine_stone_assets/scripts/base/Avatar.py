@@ -156,6 +156,10 @@ class Avatar(KBEngine.Proxy):
 
         KBEngine.globalData["Halls"].matchCoop(self, self.gbID)
 
+    def cancelMatch(self):
+        DEBUG_MSG('ckz: cancel match')
+        KBEngine.globalData["Halls"].cancelMatch(self, self.gbID)
+
     def onGetRoom(self, roomUUID, roomBox):
         self.roomUUID = roomUUID
         self.roomBox = roomBox

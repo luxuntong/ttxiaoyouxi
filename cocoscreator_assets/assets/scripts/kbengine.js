@@ -188,21 +188,25 @@ KBEngine.UINT64 = function(lo, hi)
 KBEngine.INFO_MSG = function(s)
 {
 	console.info(s);
+	KBEngine.logData += "info:" + s + '\n';
 }
 
 KBEngine.DEBUG_MSG = function(s)
 {
 	console.debug(s);
+	KBEngine.logData += "debug:" + s + '\n';
 }
 
 KBEngine.ERROR_MSG = function(s)
 {
 	console.error(s);
+	KBEngine.logData += "error:" + s + '\n';
 }
 
 KBEngine.WARNING_MSG = function(s)
 {
 	console.warn(s);
+	KBEngine.logData += "warn:" + s + '\n';
 }
 
 /*-----------------------------------------------------------------------------------------
@@ -3067,7 +3071,7 @@ KBEngine.KBEngineApp = function(kbengineArgs)
 
 	this.onerror_before_onopen = function(evt)
 	{  
-		KBEngine.ERROR_MSG('onerror_before_onopen error:' + evt.data);
+		KBEngine.ERROR_MSG('onerror_before_onopen error:' + evt);
 		KBEngine.app.resetSocket();
 		KBEngine.Event.fire(KBEngine.EventTypes.onConnectionState, false);
 	}
@@ -5204,7 +5208,7 @@ KBEngine.create = function(kbengineArgs)
 	}
 	
 	new KBEngine.KBEngineApp(kbengineArgs);
-	
+	KBEngine.logData = "";
 	KBEngine.app.reset();
 	KBEngine.app.installEvents();
 	KBEngine.idInterval = setInterval(KBEngine.app.update, kbengineArgs.updateHZ);
